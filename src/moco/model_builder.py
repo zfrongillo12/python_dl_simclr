@@ -19,8 +19,10 @@ class MoCo(nn.Module):
         # ----------------------------------------------------
         if pretrained:
             # Use V2 (default) pretrained weights for ResNet50
+            print("Using ImageNet pretrained weights for ResNet50: For encoder_q")
             self.encoder_q = resnet50(weights="IMAGENET1K_V2")
         else:
+            print("Not using pretrained weights for ResNet50: Encoder initialized randomly")
             self.encoder_q = resnet50(weights=None)
 
         # Not sure about this

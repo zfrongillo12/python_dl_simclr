@@ -7,6 +7,9 @@ from torchvision import transforms
 class ClassificationDataset(Dataset):
     """
     CSV with columns: Path, Pneumonia (0/1 or -1 etc.). Provide csv and root_dir
+    to load images and labels for classification.
+
+    Will re-map labels to be non-negative for Cross Entropy Loss.
     """
     def __init__(self, csv_path, root_dir='', transform=None, label_col='Pneumonia'):
         self.df = pd.read_csv(csv_path)
@@ -35,6 +38,12 @@ class ClassificationDataset(Dataset):
         return img, label
     
 def get_train_val_loaders(TRAIN_CSV, VAL_CSV, ROOT_DIR, BATCH_SIZE, NUM_WORKERS):
+    """
+    Creates DataLoaders for training and validation classification datasets.
+
+    Note: the ROOT_DIR is expected to have 'train' and 'val' subdirectories
+    """
+
     # Transforms for fine tuning
     transform = transforms.Compose([
         transforms.Resize(256),
@@ -44,11 +53,45 @@ def get_train_val_loaders(TRAIN_CSV, VAL_CSV, ROOT_DIR, BATCH_SIZE, NUM_WORKERS)
     ])
 
     # Load the train/val Classification Datasets
-    train_ds = ClassificationDataset(TRAIN_CSV, root_dir=ROOT_DIR, transform=transform)
-    val_ds = ClassificationDataset(VAL_CSV, root_dir=ROOT_DIR, transform=transform)
+    print("Loading training and validation datasets...")
+    print("Training CSV:", TRAIN_CSV)
+    print(" * Images - Train Root Directory:", ROOT_DIR + "/train")
+    print("Validation CSV:", VAL_CSV)
+    print(" * Images - Val Root Directory:", ROOT_DIR + "/val")
+
+    train_ds = ClassificationDataset(TRAIN_CSV, root_dir=ROOT_DIR + "/train", transform=transform)
+    val_ds = ClassificationDataset(VAL_CSV, root_dir=ROOT_DIR + "/val", transform=transform)
 
     # Create DataLoaders
     train_loader = DataLoader(train_ds, batch_size=BATCH_SIZE, shuffle=True, num_workers=NUM_WORKERS, pin_memory=True)
     val_loader = DataLoader(val_ds, batch_size=BATCH_SIZE, shuffle=False, num_workers=NUM_WORKERS, pin_memory=True)
 
     return train_loader, val_loader
+
+
+def get_test_loader(TEST_CSV, ROOT_DIR, BATCH_SIZE, NUM_WORKERS):
+    """
+    Creates DataLoader for test classification dataset.
+
+    Note: the ROOT_DIR is expected to have a 'test' subdirectory
+    """
+
+    # Transforms for fine tuning
+    transform = transforms.Compose([
+        transforms.Resize(256),
+        transforms.CenterCrop(224),
+        transforms.ToTensor(),
+        transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225])
+    ])
+
+    # Load the test Classification Dataset
+    print("Loading test dataset...")
+    print("Test CSV:", TEST_CSV)
+    print(" * Images - Test Root Directory:", ROOT_DIR + "/test")
+
+    test_ds = ClassificationDataset(TEST_CSV, root_dir=ROOT_DIR + "/test", transform=transform)
+
+    # Create DataLoader
+    test_loader = DataLoader(test_ds, batch_size=BATCH_SIZE, shuffle=False, num_workers=NUM_WORKERS, pin_memory=True)
+
+    return test_loader

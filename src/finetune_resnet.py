@@ -3,38 +3,73 @@ import torch.nn as nn
 import torch.optim as optim
 from torchvision.models import resnet50
 
-from classification_dataset import get_train_val_loaders
+from finetune.classification_dataset import get_train_val_loaders, get_test_loader
 
 from PIL import Image
 import pandas as pd
 import os
 from tqdm import tqdm
+import argparse
+import pickle
+
+def print_and_log(message, log_file=None):
+    # Print to console with datetime
+    printedatetime = __import__('datetime').datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+    print(f'[{printedatetime}] {message}')
+
+    # Log to file if log_file is provided
+    if log_file:
+        with open(log_file, 'a') as f:
+            f.write(f'[{printedatetime}] {message}\n')
+    return
 
 
-# ------- CONFIG -------
-TRAIN_CSV = 'final_project_updated_names_train.csv'
-VAL_CSV = 'final_project_updated_names_val.csv'
-ROOT_DIR = '/path/to/dataset'
-BATCH_SIZE = 32
-NUM_WORKERS = 4
-NUM_CLASSES = 3  # e.g., Pneumonia vs. No Finding vs. Other
-DEVICE = 'cuda' if torch.cuda.is_available() else 'cpu'
-PRETRAINED_ENCODER = 'moco_resnet50_encoder.pth'
-LR = 1e-4
-N_EPOCHS = 40
-# ----------------------
+def run_validation(backbone, val_loader, device, criterion):
+    backbone.eval()
+    correct = 0
+    total = 0
+    val_loss_sum = 0.0
+    val_batches = 0
 
-def run_finetune_training():
-    # Training loop
+    # Disable gradient calculation for validation
+    with torch.no_grad():
+        # Loop over validation data
+        for images, labels in val_loader:
+            images = images.to(device)
+            labels = labels.to(device)
+            logits = backbone(images)
+            preds = torch.argmax(logits, dim=1)
+            loss = criterion(logits, labels)
+            val_loss_sum += loss.item()
+            val_batches += 1
+            correct += (preds == labels).sum().item()
+            total += labels.size(0)
+
+    # Calculate accuracy and average loss
+    val_acc = correct / total if total > 0 else 0.0
+    val_loss = val_loss_sum / val_batches if val_batches > 0 else 0.0
+
+    return val_acc, val_loss
+
+def run_finetune_training(backbone, train_loader, val_loader, device, lr, n_epochs, log_file=None):
+    # Define loss and optimizer
     criterion = nn.CrossEntropyLoss()
-    optimizer = optim.Adam(backbone.parameters(), lr=LR)
+    optimizer = optim.Adam(backbone.parameters(), lr=lr)
 
-    for epoch in range(N_EPOCHS):
+    # Accumulate training stats
+    train_stats = []
+
+    # Training loop
+    for epoch in range(n_epochs):
         backbone.train()
+
+        # --- Run training ---
+        train_correct = 0
+        train_total = 0
         loop = tqdm(train_loader, desc=f'Finetune Epoch {epoch}')
         for images, labels in loop:
-            images = images.to(DEVICE)
-            labels = labels.to(DEVICE)
+            images = images.to(device)
+            labels = labels.to(device)
             logits = backbone(images)
             loss = criterion(logits, labels)
             optimizer.zero_grad()
@@ -42,32 +77,43 @@ def run_finetune_training():
             optimizer.step()
             loop.set_postfix({'loss': loss.item()})
 
-        # optionally validate
-        backbone.eval()
-        correct = 0
-        total = 0
-        with torch.no_grad():
-            for images, labels in val_loader:
-                images = images.to(DEVICE)
-                labels = labels.to(DEVICE)
-                logits = backbone(images)
-                preds = torch.argmax(logits, dim=1)
-                correct += (preds == labels).sum().item()
-                total += labels.size(0)
-        print(f'Epoch {epoch}: val_acc = {correct/total:.4f}')
+            # Training accuracy calculation
+            preds = torch.argmax(logits, dim=1)
+            train_correct += (preds == labels).sum().item()
+            train_total += labels.size(0)
+
+        train_acc = train_correct / train_total if train_total > 0 else 0.0
+
+        # --- Run validation ---
+        val_acc, val_loss = run_validation(backbone, val_loader, device, criterion)
+
+        # Update training stats
+        train_stats.append({'epoch': epoch, 'train_acc': train_acc, 'val_acc': val_acc, 'train_loss': loss.item(), 'val_loss': val_loss})
+        print_and_log(f'Epoch {epoch}: train_acc = {train_acc:.4f} | val_acc = {val_acc:.4f}', log_file)
+        print_and_log(f'Epoch {epoch}: train_loss = {loss.item():.4f} | val_loss = {val_loss:.4f}', log_file)
+
+    print_and_log("Finetuning complete.", log_file)
 
     # Save finetuned model
     torch.save({'model_state': backbone.state_dict()}, 'finetuned_model.pth')
-    print('Saved finetuned_model.pth')
+    print_and_log('Saved finetuned_model.pth', log_file)
+    return backbone, train_stats
 
-if __name__ == "__main__":
-    # Data loaders
+# ======================= Main Function ==========================
+def main(args):
+    # Create log file
+    dt = __import__('datetime').datetime.now().strftime("%Y%m%d_%H%M%S")
+    log_file = os.path.join(args.artifact_root, f'training_log_{dt}.txt')
+    os.makedirs(args.artifact_root, exist_ok=True)
+    print("Created log file: ", log_file)
+
+    # Load train and validation loaders
     train_loader, val_loader = get_train_val_loaders(
-        TRAIN_CSV,
-        VAL_CSV,
-        ROOT_DIR,
-        BATCH_SIZE,
-        NUM_WORKERS
+        args.train_csv,
+        args.val_csv,
+        args.root_dir,
+        args.batch_size,
+        args.num_workers
     )
 
     # build model and load pretrained encoder
@@ -79,11 +125,12 @@ if __name__ == "__main__":
 
     # Modify final layer for NUM_CLASSES
     in_features = backbone.fc.in_features
-    backbone.fc = nn.Linear(in_features, NUM_CLASSES)
-    backbone.to(DEVICE)
+    backbone.fc = nn.Linear(in_features, args.num_classes)
+    backbone.to(args.device)
 
-    # load pretrained encoder weights (state dict with 'encoder_q_state' or raw state dict)
-    ckpt = torch.load(PRETRAINED_ENCODER, map_location=DEVICE)
+    # Load pretrained encoder weights (state dict with 'encoder_q_state' or raw state dict)
+    ckpt = torch.load(args.pretrained_encoder, map_location=args.device)
+    print_and_log(f"Loading pretrained encoder from: {args.pretrained_encoder}", log_file)
     if 'encoder_q_state' in ckpt:
         state = ckpt['encoder_q_state']
     elif 'model_state' in ckpt:
@@ -94,6 +141,49 @@ if __name__ == "__main__":
 
     # Load state from backbone
     missing, unexpected = backbone.load_state_dict(state, strict=False)
-    print('Loaded pretrained encoder. missing keys:', missing, 'unexpected:', unexpected)
+    print_and_log(f'Loaded pretrained encoder. missing keys: {missing}, unexpected: {unexpected}', log_file)
 
-    run_finetune_training()
+    # Run finetuning
+    print_and_log("Starting finetuning...", log_file)
+    backbone, train_stats = run_finetune_training(backbone, train_loader, val_loader, args.device, args.lr, args.n_epochs, log_file=log_file)
+    print_and_log("Finetuning complete.", log_file)
+
+    # Save training stats to pickle
+    stats_path = os.path.join(args.artifact_root, 'finetune_training_stats.pkl')
+    with open(stats_path, 'wb') as f:
+        pickle.dump(train_stats, f)
+
+    # Run testing evaluation
+    test_loader = get_test_loader(
+        TEST_CSV=args.test_csv,
+        ROOT_DIR=args.root_dir,
+        BATCH_SIZE=args.batch_size,
+        NUM_WORKERS=args.num_workers
+    )
+
+    # Evaluate on test set
+    test_acc, _ = run_validation(backbone, test_loader, args.device, nn.CrossEntropyLoss())
+    print_and_log(f'Test Accuracy: {test_acc:.4f}', log_file)
+
+# ======================= Arg Parse ==========================
+if __name__ == "__main__":
+    parser = argparse.ArgumentParser(description="Finetune ResNet on custom dataset")
+    # Should be configured
+    parser.add_argument('--train_csv', type=str, default='final_project_updated_names_train.csv', help='Path to training CSV')
+    parser.add_argument('--val_csv', type=str, default='final_project_updated_names_val.csv', help='Path to validation CSV')
+    parser.add_argument('--test_csv', type=str, default='final_project_updated_names_test.csv', help='Path to test CSV')
+    parser.add_argument('--root_dir', type=str, default='/path/to/dataset', help='Root directory of images')
+    parser.add_argument('--pretrained_encoder', type=str, default='moco_resnet50_encoder.pth', help='Path to pretrained encoder weights')
+    parser.add_argument('--artifact_root', type=str, default='./finetune_artifacts', help='Directory to save artifacts')
+
+    # Optional
+    parser.add_argument('--batch_size', type=int, default=32, help='Batch size')
+    parser.add_argument('--num_workers', type=int, default=4, help='Number of data loader workers')
+    parser.add_argument('--num_classes', type=int, default=3, help='Number of output classes')
+    parser.add_argument('--device', type=str, default='cuda' if torch.cuda.is_available() else 'cpu', help='Device to use')
+    parser.add_argument('--lr', type=float, default=1e-4, help='Learning rate')
+    parser.add_argument('--n_epochs', type=int, default=40, help='Number of epochs')
+    
+    args = parser.parse_args()
+
+    main(args)

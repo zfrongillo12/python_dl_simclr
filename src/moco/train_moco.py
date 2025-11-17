@@ -109,7 +109,7 @@ def main(args):
         weight_decay=args.weight_decay
     )
 
-    # Warmup (linear) for the first 10 epochs
+    # Warmup (linear) for the first 25 epochs
     # Cosine annealing scheduler
     scheduler_cos = torch.optim.lr_scheduler.CosineAnnealingLR(
         optimizer,
@@ -158,7 +158,7 @@ if __name__ == "__main__":
     # Hyperparameters that can be tuned
     parser.add_argument('--device', type=str, default=None, help='Device to use (cuda/cpu)')
     parser.add_argument('--K', type=int, default=65536, help='Queue size')
-    parser.add_argument('--m', type=float, default=0.999, help='Momentum for updating key encoder')
+    parser.add_argument('--m', type=float, default=0.99, help='Momentum for updating key encoder')
     parser.add_argument('--T', type=float, default=0.2, help='Softmax temperature')
     parser.add_argument('--dim', type=int, default=128, help='Feature dimension')
     parser.add_argument('--seed', type=int, default=42, help='Random seed')
@@ -168,7 +168,7 @@ if __name__ == "__main__":
     parser.add_argument('--base_lr', type=float, default=0.03, help='Base learning rate')
     parser.add_argument('--momentum', type=float, default=0.9, help='SGD momentum')
     parser.add_argument('--weight_decay', type=float, default=1e-4, help='SGD weight decay')
-    parser.add_argument('--warmup_epochs', type=int, default=10, help='Number of warmup epochs')
+    parser.add_argument('--warmup_epochs', type=int, default=25, help='Number of warmup epochs')
 
     args = parser.parse_args()
 

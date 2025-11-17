@@ -60,13 +60,13 @@ def get_moco_medical_loader(csv_path, root_dir, batch_size=64, num_workers=4):
     """
     # MoCo v2-style augmentations (tuned for medical images: less color jitter optional)
     augmentation = transforms.Compose([
-        transforms.RandomResizedCrop(224, scale=(0.2, 1.0)),
+        transforms.RandomResizedCrop(224, scale=(0.8, 1.0)),
         transforms.RandomHorizontalFlip(),
         transforms.RandomApply([transforms.ColorJitter(
-            brightness=0.2, contrast=0.2, saturation=0.2, hue=0.05
-        )], p=0.5),
-        transforms.RandomGrayscale(p=0.1),
-        transforms.GaussianBlur(kernel_size=23, sigma=(0.1, 2.0)),
+            brightness=0.1, contrast=0.1, saturation=0.1, hue=0.02
+        )], p=0.2),
+        transforms.RandomGrayscale(p=0.05),
+        transforms.GaussianBlur(kernel_size=9, sigma=(0.1, 1.0)),
         transforms.ToTensor(),
         transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225])
     ])
