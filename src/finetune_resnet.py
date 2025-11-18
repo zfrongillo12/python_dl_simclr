@@ -51,7 +51,7 @@ def run_validation(backbone, val_loader, device, criterion):
 
     return val_acc, val_loss
 
-def run_finetune_training(backbone, train_loader, val_loader, device, lr, n_epochs, log_file=None, weight_decay=1e-5):
+def run_finetune_training(backbone, train_loader, val_loader, device, lr, n_epochs, log_file=None, weight_decay=1e-5, n_epochs_stop=4):
     # Define loss and optimizer
     criterion = nn.CrossEntropyLoss()
     optimizer = optim.Adam([
@@ -95,6 +95,12 @@ def run_finetune_training(backbone, train_loader, val_loader, device, lr, n_epoc
         train_stats.append({'epoch': epoch, 'train_acc': train_acc, 'val_acc': val_acc, 'train_loss': loss.item(), 'val_loss': val_loss})
         print_and_log(f'Epoch {epoch}: train_acc = {train_acc:.4f} | val_acc = {val_acc:.4f}', log_file)
         print_and_log(f'Epoch {epoch}: train_loss = {loss.item():.4f} | val_loss = {val_loss:.4f}', log_file)
+
+        # Add early stopping based on if validation accuracy decreases for 4 consecutive epochs
+        if epoch >= n_epochs_stop:
+            if all(train_stats[-i]['val_acc'] <= train_stats[-i-1]['val_acc'] for i in range(1, n_epochs_stop + 1)):
+                print_and_log(f'Early stopping at epoch {epoch} due to no improvement in validation accuracy for {n_epochs_stop} consecutive epochs.', log_file)
+                break
 
         # Save intermediate model every 5 epochs
         if (epoch + 1) % 5 == 0:
