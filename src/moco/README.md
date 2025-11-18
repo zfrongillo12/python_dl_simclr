@@ -20,6 +20,13 @@ The output feature vectors are sent to `mlp_q` and `mlp_k` as projection heads
 * Projection allows the encoder to keep general features, while the MLP pushes contrastive-specific structure into its own space
 * After training, for the classification downstream tasks, the MLPs are no longer needed (only use the encoder)
 
+#### MoCo Queue
+
+* Required so the projection head can compare the query projections against the many negative keys without the dependency on large GPU batch size
+  * Serves as a memory bank of past projected features; for stability
+  * Requirement: SimCLR showed that you need 4k–8k negative pairs per step for good results
+    * Need many, else the model will collapse or learn poor representations
+
 ### Resources
 * Momentum Contrast for Unsupervised Visual Representation Learning (MoCo V1): https://arxiv.org/pdf/1911.05722
 * Improved Baselines with Momentum Contrastive Learning (MoCo V2): https://arxiv.org/pdf/2003.04297

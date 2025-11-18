@@ -56,13 +56,15 @@ class MoCo(nn.Module):
             p.requires_grad = False
 
         # ----------------------------------------------------
-        # 3. MoCo queue
+        # 3. MoCo queue - Important to save the queue of past keys
         # ----------------------------------------------------
+        # Create the queue
         self.K = K
         self.m = m
         self.T = T
 
         self.register_buffer("queue", torch.randn(dim, K))
+        # Stored keys correspond to the negative keys
         self.queue = nn.functional.normalize(self.queue, dim=0)
 
         self.register_buffer("queue_ptr", torch.zeros(1, dtype=torch.long))

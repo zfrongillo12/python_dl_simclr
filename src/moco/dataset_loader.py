@@ -8,6 +8,7 @@ import os
 class MoCoTwoCropsTransform:
     """
     Take one image -> return two randomly augmented images.
+    This is used in MoCo for contrastive learning; produces the positive pairs (q,k) - query view and positive key
     """
     def __init__(self, base_transform):
         self.base_transform = base_transform
@@ -60,8 +61,12 @@ def collate_fn(batch):
 def get_moco_medical_loader(csv_path, root_dir, batch_size=64, num_workers=4):
     """
     Creates a MoCo DataLoader for medical images using a CSV file.
+    Note: 
+        * The dataset loader applies MoCo v2-style augmentations
+        * Will never produce negative directly for MoCo; negatives are handled internally via the queue
     """
     # MoCo v2-style augmentations (tuned for medical images: less color jitter optional)
+    # Inventory of augmentations inventory available for contrastive transformations
     augmentation = transforms.Compose([
         transforms.RandomResizedCrop(224, scale=(0.8, 1.0)),
         transforms.RandomHorizontalFlip(),
@@ -74,6 +79,8 @@ def get_moco_medical_loader(csv_path, root_dir, batch_size=64, num_workers=4):
         transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225])
     ])
 
+    # MoCo: Two crops transform
+        # Use base augmentation to create two, random different views to create the MedicalImageDataset
     dataset = MedicalImageDataset(csv_path=csv_path, root_dir=root_dir, transform=MoCoTwoCropsTransform(augmentation))
 
     drop_last = True if len(dataset) % batch_size != 0 else False
