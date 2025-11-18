@@ -20,7 +20,7 @@ The output feature vectors are sent to `mlp_q` and `mlp_k` as projection heads
 * Projection allows the encoder to keep general features, while the MLP pushes contrastive-specific structure into its own space
 * After training, for the classification downstream tasks, the MLPs are no longer needed (only use the encoder)
 
-#### MoCo Queue
+### MoCo Queue
 
 * Required so the projection head can compare the query projections against the many negative keys without the dependency on large GPU batch size
   * Serves as a memory bank of past projected features; for stability
@@ -34,3 +34,28 @@ The output feature vectors are sent to `mlp_q` and `mlp_k` as projection heads
   * https://www.analyticsvidhya.com/blog/2020/08/moco-v2-in-pytorch/ 
   * https://github.com/facebookresearch/moco/blob/main/main_moco.py
   * https://github.com/facebookresearch/moco/blob/main/moco/builder.py
+
+## DataLoader Expectations
+* Expects the folder to be formatted as such:
+
+```
+├── root_dataset
+   ├── train
+   │   ├── image.img
+   │   ├── image.img
+   │   └── image.img
+   ├── val
+   │   ├── image.img
+   │   ├── image.img
+   ├── test
+   │   ├── image.img
+   │   ├── image.img
+   └── 
+```
+
+* Description for the dataset is a CSV 
+  * 1 CSV per data partition - train.csv, val.csv, test.csv
+  * Column `Path` - file path to the data sample (relative directory should start from **./train;** e.g. should NOT include ./train for train)
+    * Please see for example CSVs at this directory: `python_dl_simclr\Dataset_Processing\NIH_Chest_XR_Pneumonia\dataset_splits`
+  * Column per dataset label
+    * e.g. `Pneumonia` with the possible values 0,1

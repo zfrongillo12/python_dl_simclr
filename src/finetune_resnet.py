@@ -12,6 +12,12 @@ from tqdm import tqdm
 import argparse
 import pickle
 
+from sklearn.metrics import classification_report
+
+from sklearn.metrics import confusion_matrix
+import seaborn as sns
+import matplotlib.pyplot as plt
+
 def print_and_log(message, log_file=None):
     # Print to console with datetime
     printedatetime = __import__('datetime').datetime.now().strftime("%Y-%m-%d %H:%M:%S")
@@ -50,6 +56,52 @@ def run_validation(backbone, val_loader, device, criterion):
     val_loss = val_loss_sum / val_batches if val_batches > 0 else 0.0
 
     return val_acc, val_loss
+
+
+def write_cm_to_file(cm, file_path, log_file=None, dataset_title='Pneumonia Classification'):
+    plt.figure(figsize=(8, 6))
+    sns.heatmap(cm, annot=True, fmt='d', cmap='Blues')
+    plt.xlabel('Predicted')
+    plt.ylabel('True Label')
+    plt.title(f'Confusion Matrix: Finetune ResNet {dataset_title}')
+    plt.savefig(file_path)
+    plt.close()
+    if log_file:
+        print_and_log(f"Saved confusion matrix to {file_path}", log_file)
+    else:
+        print(f"Saved confusion matrix to {file_path}")
+    return
+
+
+def run_testing(backbone, test_loader, device, criterion, dt, log_file, artifact_root='./', dataset_title='Pneumonia Classification'):
+    # Run base accuracy eval
+    test_acc, _ = run_validation(backbone, test_loader, device, criterion)
+    print_and_log(f'Test Accuracy: {test_acc:.4f}', log_file)
+
+    # Run sklearn classification report
+    backbone.eval()
+    all_preds = []
+    all_labels = []
+    with torch.no_grad():
+        for images, labels in test_loader:
+            images = images.to(args.device)
+            labels = labels.to(args.device)
+            logits = backbone(images)
+            preds = torch.argmax(logits, dim=1)
+            all_preds.extend(preds.cpu().numpy())
+            all_labels.extend(labels.cpu().numpy())
+    report = classification_report(all_labels, all_preds)
+    print_and_log("Classification Report:\n" + report, log_file)
+
+    # Get confusion matrix
+    cm = confusion_matrix(all_labels, all_preds)
+    print_and_log("Confusion Matrix:\n" + str(cm), log_file)
+
+    # Write confusion matrix seaborn heatmap to file
+    file_path = os.path.join(artifact_root, f'confusion_matrix_{dt}.png')
+    write_cm_to_file(cm, file_path, log_file, dataset_title=dataset_title)
+
+    return
 
 def run_finetune_training(backbone, train_loader, val_loader, device, lr, n_epochs, log_file=None, weight_decay=1e-5, n_epochs_stop=4):
     # Define loss and optimizer
@@ -123,17 +175,22 @@ def main(args):
     os.makedirs(args.artifact_root, exist_ok=True)
     print("Created log file: ", log_file)
 
-    # ------- Dataset Loaders -------
+    # ----------------------------------------------------
+    # Dataset Loaders
+    # ----------------------------------------------------
     # Load train and validation loaders
     train_loader, val_loader = get_train_val_loaders(
-        args.train_csv,
-        args.val_csv,
-        args.root_dir,
-        args.batch_size,
-        args.num_workers
+        TRAIN_CSV=args.train_csv,
+        VAL_CSV=args.val_csv,
+        ROOT_DIR=args.root_dir,
+        BATCH_SIZE=args.batch_size,
+        NUM_WORKERS=args.num_workers,
+        label_col=args.label_col
     )
 
-    # ------- Model Setup -------
+    # ----------------------------------------------------
+    # Model Setup 
+    # ----------------------------------------------------
     # build model and load pretrained encoder
     try:
         from torchvision.models import ResNet50_Weights
@@ -166,7 +223,9 @@ def main(args):
         if not ("layer3" in name or "layer4" in name or "fc" in name):
             param.requires_grad = False
 
-    # ------- Finetuning -------
+    # ----------------------------------------------------
+    # Finetuning
+    # ----------------------------------------------------
     # Run finetuning
     print_and_log("Starting finetuning...", log_file)
     backbone, train_stats = run_finetune_training(backbone, train_loader, val_loader, args.device, args.lr, args.n_epochs, log_file=log_file)
@@ -177,18 +236,30 @@ def main(args):
     with open(stats_path, 'wb') as f:
         pickle.dump(train_stats, f)
 
-    # ------- Testing -------
-    # Run testing evaluation
+    # ----------------------------------------------------
+    # Run Testing evaluation 
+    # ----------------------------------------------------
+    # Get test dataset loader
     test_loader = get_test_loader(
         TEST_CSV=args.test_csv,
         ROOT_DIR=args.root_dir,
         BATCH_SIZE=args.batch_size,
-        NUM_WORKERS=args.num_workers
+        NUM_WORKERS=args.num_workers,
+        label_col=args.label_col
     )
 
-    # Evaluate on test set
-    test_acc, _ = run_validation(backbone, test_loader, args.device, nn.CrossEntropyLoss())
-    print_and_log(f'Test Accuracy: {test_acc:.4f}', log_file)
+    # Run testing
+    print_and_log("Starting testing evaluation...", log_file)
+    run_testing(backbone=backbone,
+                test_loader=test_loader,
+                device=args.device,
+                criterion=nn.CrossEntropyLoss(),
+                dt=dt, 
+                log_file=log_file,
+                artifact_root=args.artifact_root,
+                dataset_title=args.dataset_title)
+    
+    return
 
 # ======================= Arg Parse ==========================
 if __name__ == "__main__":
@@ -200,11 +271,13 @@ if __name__ == "__main__":
     parser.add_argument('--root_dir', type=str, default='/path/to/dataset', help='Root directory of images')
     parser.add_argument('--pretrained_encoder', type=str, default='moco_resnet50_encoder.pth', help='Path to pretrained encoder weights')
     parser.add_argument('--artifact_root', type=str, default='./finetune_artifacts', help='Directory to save artifacts')
+    parser.add_argument('--label_col', type=str, default='Pneumonia', help='Name of the label column in the dataset')
+    parser.add_argument('--num_classes', type=int, default=3, help='Number of output classes')
+    parser.add_argument('--dataset_title', type=str, default='Pneumonia Classification', help='Title of the dataset for logging')
 
     # Optional
     parser.add_argument('--batch_size', type=int, default=32, help='Batch size')
     parser.add_argument('--num_workers', type=int, default=4, help='Number of data loader workers')
-    parser.add_argument('--num_classes', type=int, default=3, help='Number of output classes')
     parser.add_argument('--device', type=str, default='cuda' if torch.cuda.is_available() else 'cpu', help='Device to use')
     parser.add_argument('--lr', type=float, default=1e-5, help='Learning rate')
     parser.add_argument('--n_epochs', type=int, default=20, help='Number of epochs')
