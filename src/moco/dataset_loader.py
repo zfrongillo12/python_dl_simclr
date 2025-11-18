@@ -49,6 +49,9 @@ class MedicalImageDataset(Dataset):
 
 
 def collate_fn(batch):
+    """
+    Custom collate function to handle batches of (im_q, im_k) tuples.
+    """
     im_q = torch.stack([b[0] for b in batch], dim=0)
     im_k = torch.stack([b[1] for b in batch], dim=0)
     return im_q, im_k

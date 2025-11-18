@@ -123,6 +123,7 @@ def main(args):
     os.makedirs(args.artifact_root, exist_ok=True)
     print("Created log file: ", log_file)
 
+    # ------- Dataset Loaders -------
     # Load train and validation loaders
     train_loader, val_loader = get_train_val_loaders(
         args.train_csv,
@@ -132,6 +133,7 @@ def main(args):
         args.num_workers
     )
 
+    # ------- Model Setup -------
     # build model and load pretrained encoder
     try:
         from torchvision.models import ResNet50_Weights
@@ -164,6 +166,7 @@ def main(args):
         if not ("layer3" in name or "layer4" in name or "fc" in name):
             param.requires_grad = False
 
+    # ------- Finetuning -------
     # Run finetuning
     print_and_log("Starting finetuning...", log_file)
     backbone, train_stats = run_finetune_training(backbone, train_loader, val_loader, args.device, args.lr, args.n_epochs, log_file=log_file)
@@ -174,6 +177,7 @@ def main(args):
     with open(stats_path, 'wb') as f:
         pickle.dump(train_stats, f)
 
+    # ------- Testing -------
     # Run testing evaluation
     test_loader = get_test_loader(
         TEST_CSV=args.test_csv,
