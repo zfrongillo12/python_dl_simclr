@@ -51,10 +51,14 @@ def run_validation(backbone, val_loader, device, criterion):
 
     return val_acc, val_loss
 
-def run_finetune_training(backbone, train_loader, val_loader, device, lr, n_epochs, log_file=None):
+def run_finetune_training(backbone, train_loader, val_loader, device, lr, n_epochs, log_file=None, weight_decay=1e-5):
     # Define loss and optimizer
     criterion = nn.CrossEntropyLoss()
-    optimizer = optim.Adam(backbone.parameters(), lr=lr)
+    optimizer = optim.Adam([
+        {"params": backbone.layer3.parameters(), "lr": 5e-6},
+        {"params": backbone.layer4.parameters(), "lr": 5e-6},
+        {"params": backbone.fc.parameters(), "lr": 1e-3},
+    ], weight_decay=weight_decay)
 
     # Accumulate training stats
     train_stats = []
@@ -91,6 +95,12 @@ def run_finetune_training(backbone, train_loader, val_loader, device, lr, n_epoc
         train_stats.append({'epoch': epoch, 'train_acc': train_acc, 'val_acc': val_acc, 'train_loss': loss.item(), 'val_loss': val_loss})
         print_and_log(f'Epoch {epoch}: train_acc = {train_acc:.4f} | val_acc = {val_acc:.4f}', log_file)
         print_and_log(f'Epoch {epoch}: train_loss = {loss.item():.4f} | val_loss = {val_loss:.4f}', log_file)
+
+        # Save intermediate model every 5 epochs
+        if (epoch + 1) % 5 == 0:
+            checkpoint_path = f'finetuned_model_epoch_{epoch+1}.pth'
+            torch.save({'model_state': backbone.state_dict()}, checkpoint_path)
+            print_and_log(f'Saved checkpoint: {checkpoint_path}', log_file)
 
     print_and_log("Finetuning complete.", log_file)
 
@@ -143,6 +153,11 @@ def main(args):
     missing, unexpected = backbone.load_state_dict(state, strict=False)
     print_and_log(f'Loaded pretrained encoder. missing keys: {missing}, unexpected: {unexpected}', log_file)
 
+    # Freeze backbone layers - 70/80% of layers frozen
+    for name, param in backbone.named_parameters():
+        if not ("layer3" in name or "layer4" in name or "fc" in name):
+            param.requires_grad = False
+
     # Run finetuning
     print_and_log("Starting finetuning...", log_file)
     backbone, train_stats = run_finetune_training(backbone, train_loader, val_loader, args.device, args.lr, args.n_epochs, log_file=log_file)
@@ -181,8 +196,8 @@ if __name__ == "__main__":
     parser.add_argument('--num_workers', type=int, default=4, help='Number of data loader workers')
     parser.add_argument('--num_classes', type=int, default=3, help='Number of output classes')
     parser.add_argument('--device', type=str, default='cuda' if torch.cuda.is_available() else 'cpu', help='Device to use')
-    parser.add_argument('--lr', type=float, default=1e-4, help='Learning rate')
-    parser.add_argument('--n_epochs', type=int, default=40, help='Number of epochs')
+    parser.add_argument('--lr', type=float, default=1e-5, help='Learning rate')
+    parser.add_argument('--n_epochs', type=int, default=20, help='Number of epochs')
     
     args = parser.parse_args()
 

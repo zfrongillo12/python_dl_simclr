@@ -4,7 +4,7 @@ import pandas as pd
 from torch.utils.data import Dataset, DataLoader
 from torchvision import transforms
 
-class ClassificationDataset(Dataset):
+class PneumoniaCheXpertClassificationDataset(Dataset):
     """
     CSV with columns: Path, Pneumonia (0/1 or -1 etc.). Provide csv and root_dir
     to load images and labels for classification.
@@ -59,8 +59,8 @@ def get_train_val_loaders(TRAIN_CSV, VAL_CSV, ROOT_DIR, BATCH_SIZE, NUM_WORKERS)
     print("Validation CSV:", VAL_CSV)
     print(" * Images - Val Root Directory:", ROOT_DIR + "/val")
 
-    train_ds = ClassificationDataset(TRAIN_CSV, root_dir=ROOT_DIR + "/train", transform=transform)
-    val_ds = ClassificationDataset(VAL_CSV, root_dir=ROOT_DIR + "/val", transform=transform)
+    train_ds = PneumoniaCheXpertClassificationDataset(TRAIN_CSV, root_dir=ROOT_DIR + "/train", transform=transform)
+    val_ds = PneumoniaCheXpertClassificationDataset(VAL_CSV, root_dir=ROOT_DIR + "/val", transform=transform)
 
     # Create DataLoaders
     train_loader = DataLoader(train_ds, batch_size=BATCH_SIZE, shuffle=True, num_workers=NUM_WORKERS, pin_memory=True)
@@ -89,7 +89,7 @@ def get_test_loader(TEST_CSV, ROOT_DIR, BATCH_SIZE, NUM_WORKERS):
     print("Test CSV:", TEST_CSV)
     print(" * Images - Test Root Directory:", ROOT_DIR + "/test")
 
-    test_ds = ClassificationDataset(TEST_CSV, root_dir=ROOT_DIR + "/test", transform=transform)
+    test_ds = PneumoniaCheXpertClassificationDataset(TEST_CSV, root_dir=ROOT_DIR + "/test", transform=transform)
 
     # Create DataLoader
     test_loader = DataLoader(test_ds, batch_size=BATCH_SIZE, shuffle=False, num_workers=NUM_WORKERS, pin_memory=True)
