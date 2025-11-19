@@ -55,7 +55,7 @@ class PneumoniaClassificationDataset(Dataset):
         # Obtain labels - re-map values if necessary
         # Cross Entropy requires non-negative labels (e.g., 0,1,2)
         self.df = check_label_values(self.df, label_col)
-        self.labels = [x + 1 for x in self.df[label_col].tolist()]
+        self.labels = [int(x) for x in self.df[label_col]]
         self.root_dir = root_dir
         self.transform = transform
 

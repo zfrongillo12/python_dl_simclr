@@ -184,7 +184,7 @@ def main(args):
     # Labeled dataset for linear evaluation
     linear_train_loader = get_classification_data_loader(
         data_split_type='train',
-        CSV_PATH=args.train_csv_path,
+        CSV_PATH=args.linear_train_csv_path,
         ROOT_DIR=args.root_dir,
         batch_size=args.batch_size,
         num_workers=args.num_workers,
@@ -192,7 +192,7 @@ def main(args):
     )
     linear_test_loader = get_classification_data_loader(
         data_split_type='test',
-        CSV_PATH=args.test_csv_path,
+        CSV_PATH=args.linear_test_csv_path,
         ROOT_DIR=args.root_dir,
         batch_size=args.batch_size,
         num_workers=args.num_workers,
@@ -206,6 +206,7 @@ def main(args):
         linear_train_loader,
         linear_test_loader,
         device=device,
+        linear_n_epochs=args.linear_n_epochs,
         num_classes=args.test_num_classes,
         log_file=test_log_file
     )
@@ -228,12 +229,16 @@ if __name__ == "__main__":
     parser.add_argument('--test_csv_path', type=str, default='test.csv', help='Test CSV file with image paths')
     parser.add_argument('--root_dir', type=str, default='/path/to/dataset', help='Root directory for images')
     parser.add_argument('--artifact_root', type=str, default='./artifacts/', help='Directory for checkpoints')
+    
+    # For testing
     parser.add_argument('--test_num_classes', type=int, default=2, help='Number of classes for testing classification')
+    parser.add_argument('--linear_n_epochs', type=int, default=30, help='Number of epochs for test linear classification training')
+    parser.add_argument('--linear_train_csv_path', type=str, default='linear_train.csv', help='Train CSV file with image paths')
+    parser.add_argument('--linear_test_csv_path', type=str, default='linear_test.csv', help='Test CSV file with image paths')
     
     # Optional
     parser.add_argument('--batch_size', type=int, default=32, help='Batch size')
     parser.add_argument('--n_epochs', type=int, default=200, help='Number of epochs for backbone training')
-    parser.add_argument('--n_epochs_cls', type=int, default=30, help='Number of epochs for test linear classification training')
     parser.add_argument('--out_model_name', type=str, default='moco_resnet50_encoder.pth', help='Output filename for encoder')
     parser.add_argument('--label_col', type=str, default='Pneumonia', help='Label column name in CSV for classification dataset')
 

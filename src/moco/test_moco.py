@@ -83,7 +83,7 @@ def run_linear_evaluation(backbone, linear_head, train_loader, test_loader, epoc
 # ================================================================================
 # Test MoCo backbone
 # ================================================================================
-def test_moco_backbone(model, train_loader, test_loader, test_cls_epochs=20, device='cuda', num_classes=2, log_file=None):
+def test_moco_backbone(model, train_loader, test_loader, linear_n_epochs=20, device='cuda', num_classes=2, log_file=None):
     # 1) Extract the backbone encoder_q
     backbone = model.encoder_q
 
@@ -106,14 +106,14 @@ def test_moco_backbone(model, train_loader, test_loader, test_cls_epochs=20, dev
     # 4) Run linear evaluation
     # Train only the linear layer on the labeled dataset
     # Measure the accuracy on the test set after training
-    test_stats = run_linear_evaluation(backbone, classifier_head, train_loader=train_loader, test_loader=test_loader, epochs=test_cls_epochs, device=device, log_file=log_file)
+    test_stats = run_linear_evaluation(backbone, classifier_head, train_loader=train_loader, test_loader=test_loader, epochs=linear_n_epochs, device=device, log_file=log_file)
 
     return test_stats
 
 
-def run_moco_testing(model, train_loader, test_loader, device='cuda', num_classes=2, log_file="./artifacts/testing_log.txt"):
+def run_moco_testing(model, train_loader, test_loader, linear_n_epochs=20, device='cuda', num_classes=2, log_file="./artifacts/testing_log.txt"):
     print_and_log("Starting MoCo backbone testing...", log_file=log_file)
-    test_stats = test_moco_backbone(model, train_loader, test_loader, device=device, num_classes=num_classes, log_file=log_file)
+    test_stats = test_moco_backbone(model, train_loader, test_loader, linear_n_epochs, device=device, num_classes=num_classes, log_file=log_file)
     print_and_log("MoCo backbone testing complete!", log_file=log_file)
 
     return test_stats
