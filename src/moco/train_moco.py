@@ -2,29 +2,31 @@ import torch
 import torch.optim as optim
 from torch.utils.data import DataLoader
 from model_builder import MoCo
-from dataset_loader import get_moco_medical_loader
-from utils import set_seed, save_state
 from tqdm import tqdm
 import argparse
 import os
 import json
 
-def print_and_log(message, log_file=None):
-    # Print to console with datetime
-    printedatetime = __import__('datetime').datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-    print(f'[{printedatetime}] {message}')
+from finetune.classification_dataset import get_classification_data_loader
 
-    # Log to file if log_file is provided
-    if log_file:
-        with open(log_file, 'a') as f:
-            f.write(f'[{printedatetime}] {message}\n')
-    return
+from dataset_loader import get_moco_medical_loader
+from utils import set_seed, save_state, print_and_log
+from test_moco import run_moco_testing
 
-def run_moco_training(model, n_epochs, train_loader, optimizer, warmup_epochs, scheduler_cos, artifact_root="./artifacts/", base_lr=0.03, log_file="./artifacts/training_log.txt"):
+
+def run_moco_training(model,
+                      n_epochs,
+                      train_loader,
+                      optimizer,
+                      warmup_epochs,
+                      scheduler_cos, 
+                      artifact_root="./artifacts/",
+                      base_lr=0.03,
+                      log_file="./artifacts/training_log.txt"):
     # Start training log
     print_and_log(f"Starting MoCo training for {n_epochs} epochs", log_file=log_file)
 
-    # Accumulate training stats for pretrainig
+    # Accumulate training stats for pretraining
     train_stats = []
 
     for epoch in range(n_epochs):
@@ -76,6 +78,15 @@ def run_moco_training(model, n_epochs, train_loader, optimizer, warmup_epochs, s
 
     return model, train_stats
 
+def save_stats(stats, path, stat_type, log_file=None):
+    with open(path, 'w') as f:
+        json.dump(stats, f)
+    print_and_log(f"Saved {stat_type} stats to {path}", log_file=log_file)
+    return
+
+# ================================================================================
+# Main function to parse arguments and run training + testing
+# ================================================================================
 def main(args):
     set_seed(args.seed)
 
@@ -83,11 +94,14 @@ def main(args):
 
     # Create log file
     dt = __import__('datetime').datetime.now().strftime("%Y%m%d_%H%M%S")
-    log_file = os.path.join(args.artifact_root, f'training_log_{dt}.txt')
+    log_file = os.path.join(args.artifact_root, f'moco_training_log_{dt}.txt')
     os.makedirs(args.artifact_root, exist_ok=True)
     print("Created log file: ", log_file)
 
+    # ---------------------------------------
     # Get training loader
+    # ---------------------------------------
+    print_and_log(f"Creating MoCo medical image Train DataLoader... : from {args.csv_path}", log_file=log_file)
     train_loader = get_moco_medical_loader(
         csv_path=args.csv_path,
         root_dir=args.root_dir,
@@ -95,7 +109,11 @@ def main(args):
         num_workers=args.num_workers
     )
 
-    # Use pretrained imagenet weights (ResNet50 backbone is instantiated by MoCo) - by default True
+    # ---------------------------------------
+    # Model Setup - MoCo
+    # ---------------------------------------
+    # Use ResNet50 backbone is instantiated by MoCo
+    # by default, no pretraining should be applied
     model = MoCo(dim=args.dim, K=args.K, m=args.m, T=args.T, pretrained=args.pretrained_imagenet, device=device)
     model.to(device)
 
@@ -116,6 +134,10 @@ def main(args):
         T_max=max(1, args.n_epochs - args.warmup_epochs)
     )
 
+    # ---------------------------------------
+    # Training Loop
+    # ---------------------------------------
+
     # Run encoder training
     model, train_stats = run_moco_training(
         model,
@@ -131,29 +153,84 @@ def main(args):
     print_and_log('MoCo training complete!!', log_file=log_file)
 
     # Save the trained encoder (query backbone + mlp)
+    # After training, save only 
+    #   1) the encoder_q (used as the backbone for transfer learning)
+    #   2) mlp_q (for further pre-training; but is generally not used for transfer learning)
+
+    # Create file name for saving model - use args.out_model_name
+    model_output_path = os.path.join(args.artifact_root, args.out_model_name)
+
+    # Save encoder_q and mlp_q state dicts
     torch.save({
         'encoder_q_state': model.encoder_q.state_dict(),
         'mlp_q_state': model.mlp_q.state_dict()
-    }, args.out_path)
-    print_and_log('Saved pretrained encoder to', args.out_path)
+    }, model_output_path)
+    print_and_log(f"Saved pretrained encoder to {model_output_path}", log_file=log_file)
 
     # Save training stats
-    with open(args.artifact_root + '/train_stats.json', 'w') as f:
-        json.dump(train_stats, f)
-    print_and_log('Saved training stats to', args.artifact_root + '/train_stats.json')
+    save_stats(train_stats, args.artifact_root + '/train_stats.json', 'training', log_file=log_file)
+
+    # ---------------------------------------
+    # Run Testing
+    # ---------------------------------------
+    # Get test loader
+    print_and_log("Starting MoCo backbone testing...", log_file=log_file)
+    
+    # Derive test CSV path from train CSV path
+    test_csv_path = args.csv_path.replace('train', 'test')
+
+    # Get training and testing loaders - for linear evaluation (classification dataset labels needed)
+    linear_train_loader = get_classification_data_loader(
+        data_split_type='train',
+        CSV_PATH=args.train_csv,
+        ROOT_DIR=args.root_dir,
+        batch_size=args.batch_size,
+        num_workers=args.num_workers,
+        label_col=args.label_col
+    )
+    linear_test_loader = get_classification_data_loader(
+        data_split_type='test',
+        CSV_PATH=test_csv_path, # Note: This is derived from train CSV path
+        ROOT_DIR=args.root_dir,
+        batch_size=args.batch_size,
+        num_workers=args.num_workers,
+        label_col=args.label_col
+    )
+
+    # Run testing
+    test_log_file = os.path.join(args.artifact_root, f'moco_testing_log_{dt}.txt')
+    test_stats = run_moco_testing(
+        model,
+        linear_train_loader,
+        linear_test_loader,
+        device='cuda',
+        num_classes=args.test_num_classes,
+        log_file=test_log_file
+    )
+    print_and_log("MoCo backbone testing complete!!", log_file=log_file)
+
+    # Save testing stats
+    save_stats(test_stats, args.artifact_root + '/test_stats.json', 'testing', log_file=log_file)
+
+    return
 
 
+# ================================================================================
+# Entry point / Argument parsing
+# ================================================================================
 if __name__ == "__main__":
     # Argument parser for CLI configuration
     parser = argparse.ArgumentParser(description="MoCo Medical Encoder Training")
     # Should be set
-    parser.add_argument('--csv_path', type=str, default='train.csv', help='Train CSV file with image paths')
+    parser.add_argument('--train_csv_path', type=str, default='train.csv', help='Train CSV file with image paths')
     parser.add_argument('--root_dir', type=str, default='/path/to/dataset', help='Root directory for images')
     parser.add_argument('--artifact_root', type=str, default='./artifacts/', help='Directory for checkpoints')
+    parser.add_argument('--test_num_classes', type=int, default=2, help='Number of classes for testing classification')
     
     # Optional
     parser.add_argument('--batch_size', type=int, default=32, help='Batch size')
     parser.add_argument('--n_epochs', type=int, default=200, help='Number of epochs')
+    parser.add_argument('--out_model_name', type=str, default='moco_resnet50_encoder.pth', help='Output filename for encoder')
 
     # Hyperparameters that can be tuned
     parser.add_argument('--device', type=str, default=None, help='Device to use (cuda/cpu)')
@@ -163,8 +240,7 @@ if __name__ == "__main__":
     parser.add_argument('--dim', type=int, default=128, help='Feature dimension')
     parser.add_argument('--seed', type=int, default=42, help='Random seed')
     parser.add_argument('--num_workers', type=int, default=4, help='Number of data loader workers')
-    parser.add_argument('--pretrained_imagenet', type=bool, default=True, help='Use ImageNet pretrained weights')
-    parser.add_argument('--out_path', type=str, default='moco_resnet50_encoder.pth', help='Output path for encoder')
+    parser.add_argument('--pretrained_imagenet', type=bool, default=False, help='Use ImageNet pretrained weights')
     parser.add_argument('--base_lr', type=float, default=0.03, help='Base learning rate')
     parser.add_argument('--momentum', type=float, default=0.9, help='SGD momentum')
     parser.add_argument('--weight_decay', type=float, default=1e-4, help='SGD weight decay')

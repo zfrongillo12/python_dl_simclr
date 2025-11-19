@@ -9,7 +9,7 @@ class MoCo(nn.Module):
     """
     Build a MoCo encoder: query encoder & momentum-updated key encoder
     """
-    def __init__(self, dim=128, K=65536, m=0.999, T=0.2, pretrained=True, device='cuda'):
+    def __init__(self, dim=128, K=65536, m=0.999, T=0.2, pretrained=False, device='cuda'):
         super().__init__()
         self.device = device
         self.pretrained = pretrained

@@ -3,7 +3,7 @@ import torch.nn as nn
 import torch.optim as optim
 from torchvision.models import resnet50
 
-from finetune.classification_dataset import get_train_val_loaders, get_test_loader
+from finetune.classification_dataset import get_classification_data_loader
 
 from PIL import Image
 import pandas as pd
@@ -179,12 +179,21 @@ def main(args):
     # Dataset Loaders
     # ----------------------------------------------------
     # Load train and validation loaders
-    train_loader, val_loader = get_train_val_loaders(
-        TRAIN_CSV=args.train_csv,
-        VAL_CSV=args.val_csv,
+    train_loader = get_classification_data_loader(
+        data_split_type='train',
+        CSV_PATH=args.train_csv,
         ROOT_DIR=args.root_dir,
-        BATCH_SIZE=args.batch_size,
-        NUM_WORKERS=args.num_workers,
+        batch_size=args.batch_size,
+        num_workers=args.num_workers,
+        label_col=args.label_col
+    )
+    
+    val_loader = get_classification_data_loader(
+        data_split_type='val',
+        CSV_PATH=args.val_csv,
+        ROOT_DIR=args.root_dir,
+        batch_size=args.batch_size,
+        num_workers=args.num_workers,
         label_col=args.label_col
     )
 
@@ -203,12 +212,16 @@ def main(args):
     backbone.fc = nn.Linear(in_features, args.num_classes)
     backbone.to(args.device)
 
+
     # Load pretrained encoder weights (state dict with 'encoder_q_state' or raw state dict)
     ckpt = torch.load(args.pretrained_encoder, map_location=args.device)
     print_and_log(f"Loading pretrained encoder from: {args.pretrained_encoder}", log_file)
+    # For MoCo: Only use the encoder for the backbone
     if 'encoder_q_state' in ckpt:
+        print_and_log("Detected 'encoder_q_state' in checkpoint.", log_file)
         state = ckpt['encoder_q_state']
     elif 'model_state' in ckpt:
+        print_and_log("Detected 'model_state' in checkpoint. Extracting encoder_q weights.", log_file)
         # If saved full model, try to extract encoder
         state = {k.replace('encoder_q.', ''): v for k, v in ckpt['model_state'].items() if k.startswith('encoder_q')}
     else:
@@ -240,11 +253,12 @@ def main(args):
     # Run Testing evaluation 
     # ----------------------------------------------------
     # Get test dataset loader
-    test_loader = get_test_loader(
-        TEST_CSV=args.test_csv,
+    test_loader = get_classification_data_loader(
+        data_split_type='test',
+        CSV_PATH=args.test_csv,
         ROOT_DIR=args.root_dir,
-        BATCH_SIZE=args.batch_size,
-        NUM_WORKERS=args.num_workers,
+        batch_size=args.batch_size,
+        num_workers=args.num_workers,
         label_col=args.label_col
     )
 

@@ -1,6 +1,10 @@
 # MoCo
 
-* To reduce SimCLR's dependence on large batch sizes, will use MoCo framework for the contrastive learning 
+* To reduce SimCLR's dependence on large batch sizes, will use MoCo framework for the contrastive learning.
+* **MoCo**: Self-supervised pretraining strategy to learn visual representation of images *without* labels.
+  * Pre-text task:
+    * Learn to differentiate positive pairs (two augmented views of the same image)
+    * Versus negative pairs (the other images) 
 
 ## About the Architecture
 
@@ -59,3 +63,26 @@ The output feature vectors are sent to `mlp_q` and `mlp_k` as projection heads
     * Please see for example CSVs at this directory: `python_dl_simclr\Dataset_Processing\NIH_Chest_XR_Pneumonia\dataset_splits`
   * Column per dataset label
     * e.g. `Pneumonia` with the possible values 0,1
+
+## MoCo Testing Strategy
+
+### Linear Evaluation
+
+* Consistent with MoCo v2 paper (and other SSL papers)
+
+**Overview:**
+1. Freeze the pretrained backbone (no gradient updates)
+2. Add a single linear layer for classification.
+3. Train only the linear layer on your labeled train set.
+4. Measure accuracy on your test set.
+
+**Objective:**
+* Tells us how good the representation is *without* fine-tuning
+* Comparable to other SSL literature
+
+#### MoCo Pretraining
+* No labels, no classes
+* The dataset is all un-labeled images, where there are positive pairs (im_q, im_k), and all other images act as negatives via the queue
+
+#### Linear Evaluation using MLP
+* Need to send in data that has the labels needed for the downstream image classification task

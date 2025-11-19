@@ -4,6 +4,7 @@ import pandas as pd
 from torch.utils.data import Dataset, DataLoader
 from torchvision import transforms
 
+# Helper function to check and re-map label values
 def check_label_values(df, label_col):
     """
     Check the label values in the dataframe column.
@@ -28,7 +29,9 @@ def check_label_values(df, label_col):
         print(f"POST-update: Unique labels in column '{label_col}': {unique_labels}")
     return df
 
-
+# ===============================================================================
+# Labeled Dataset Definition
+# ===============================================================================
 class PneumoniaClassificationDataset(Dataset):
     """
     CSV with columns: Path, Pneumonia (0/1 or -1 etc.). Provide csv and root_dir
@@ -60,6 +63,7 @@ class PneumoniaClassificationDataset(Dataset):
         return len(self.paths)
 
     def __getitem__(self, idx):
+        # Combine root + file path to obtain item
         p = os.path.join(self.root_dir, self.paths[idx])
         img = Image.open(p).convert('RGB')
         if self.transform:
@@ -67,12 +71,22 @@ class PneumoniaClassificationDataset(Dataset):
         label = int(self.labels[idx])
         return img, label
 
-def get_train_val_loaders(TRAIN_CSV, VAL_CSV, ROOT_DIR, BATCH_SIZE, NUM_WORKERS, label_col='Pneumonia'):
-    """
-    Creates DataLoaders for training and validation classification datasets.
+# ===============================================================================
+# DataLoader Creation Functions
+# ===============================================================================
 
-    Note: the ROOT_DIR is expected to have 'train' and 'val' subdirectories
+def get_classification_data_loader(data_split_type, CSV_PATH, ROOT_DIR, batch_size, num_workers, label_col='Pneumonia'):
     """
+    Creates DataLoader for classification dataset.
+    * CSV_PATH: Path to the CSV file containing image paths and labels
+    * ROOT_DIR: Root directory for images
+    * data_split_type: 'train', 'val', or 'test' - used for logging purposes
+
+    Note: the ROOT_DIR is expected to have a 'train' / 'val' / 'test' subdirectory
+    """
+    # Check data_split_type
+    if data_split_type not in ['train', 'val', 'test']:
+        raise ValueError("data_split_type must be one of: 'train', 'val', 'test'")
 
     # Transforms for fine tuning
     transform = transforms.Compose([
@@ -82,46 +96,12 @@ def get_train_val_loaders(TRAIN_CSV, VAL_CSV, ROOT_DIR, BATCH_SIZE, NUM_WORKERS,
         transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225])
     ])
 
-    # Load the train/val Classification Datasets
-    print("Loading training and validation datasets...")
-    print("Training CSV:", TRAIN_CSV)
-    print(" * Images - Train Root Directory:", ROOT_DIR + "/train")
-    print("Validation CSV:", VAL_CSV)
-    print(" * Images - Val Root Directory:", ROOT_DIR + "/val")
+    # Load the Classification Dataset
+    print(f"Loading {data_split_type} dataset...")
+    print("CSV:", CSV_PATH)
+    print(f" * Images - {data_split_type.capitalize()} Root Directory:", ROOT_DIR + f"/{data_split_type}")
 
-    train_ds = PneumoniaClassificationDataset(TRAIN_CSV, root_dir=ROOT_DIR + "/train", transform=transform, label_col=label_col)
-    val_ds = PneumoniaClassificationDataset(VAL_CSV, root_dir=ROOT_DIR + "/val", transform=transform, label_col=label_col)
+    # Create Dataset
+    dataset = PneumoniaClassificationDataset(CSV_PATH, root_dir=ROOT_DIR, transform=transform, label_col=label_col)
 
-    # Create DataLoaders
-    train_loader = DataLoader(train_ds, batch_size=BATCH_SIZE, shuffle=True, num_workers=NUM_WORKERS, pin_memory=True)
-    val_loader = DataLoader(val_ds, batch_size=BATCH_SIZE, shuffle=False, num_workers=NUM_WORKERS, pin_memory=True)
-
-    return train_loader, val_loader
-
-
-def get_test_loader(TEST_CSV, ROOT_DIR, BATCH_SIZE, NUM_WORKERS, label_col='Pneumonia'):
-    """
-    Creates DataLoader for test classification dataset.
-
-    Note: the ROOT_DIR is expected to have a 'test' subdirectory
-    """
-
-    # Transforms for fine tuning
-    transform = transforms.Compose([
-        transforms.Resize(256),
-        transforms.CenterCrop(224),
-        transforms.ToTensor(),
-        transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225])
-    ])
-
-    # Load the test Classification Dataset
-    print("Loading test dataset...")
-    print("Test CSV:", TEST_CSV)
-    print(" * Images - Test Root Directory:", ROOT_DIR + "/test")
-
-    test_ds = PneumoniaClassificationDataset(TEST_CSV, root_dir=ROOT_DIR + "/test", transform=transform, label_col=label_col)
-
-    # Create DataLoader
-    test_loader = DataLoader(test_ds, batch_size=BATCH_SIZE, shuffle=False, num_workers=NUM_WORKERS, pin_memory=True)
-
-    return test_loader
+    return DataLoader(dataset, batch_size=batch_size, shuffle=True, num_workers=num_workers)

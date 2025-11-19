@@ -61,6 +61,8 @@ def collate_fn(batch):
 def get_moco_medical_loader(csv_path, root_dir, batch_size=64, num_workers=4):
     """
     Creates a MoCo DataLoader for medical images using a CSV file.
+    Unlabeled dataset for MoCo pretraining.
+
     Note: 
         * The dataset loader applies MoCo v2-style augmentations
         * Will never produce negative directly for MoCo; negatives are handled internally via the queue
@@ -70,6 +72,8 @@ def get_moco_medical_loader(csv_path, root_dir, batch_size=64, num_workers=4):
     augmentation = transforms.Compose([
         transforms.RandomResizedCrop(224, scale=(0.8, 1.0)),
         transforms.RandomHorizontalFlip(),
+        transforms.RandomVerticalFlip(),
+        transforms.RandomRotation(degrees=15),
         transforms.RandomApply([transforms.ColorJitter(
             brightness=0.1, contrast=0.1, saturation=0.1, hue=0.02
         )], p=0.2),
@@ -83,6 +87,10 @@ def get_moco_medical_loader(csv_path, root_dir, batch_size=64, num_workers=4):
         # Use base augmentation to create two, random different views to create the MedicalImageDataset
     dataset = MedicalImageDataset(csv_path=csv_path, root_dir=root_dir, transform=MoCoTwoCropsTransform(augmentation))
 
+    # Print size of dataset
+    print(f"Training Dataset size: {len(dataset)} images")
+
+    # Create DataLoader
     drop_last = True if len(dataset) % batch_size != 0 else False
     loader = DataLoader(dataset, batch_size=batch_size, shuffle=True, num_workers=num_workers, pin_memory=True, drop_last=drop_last, collate_fn=collate_fn)
     return loader
