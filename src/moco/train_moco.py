@@ -1,13 +1,15 @@
 import torch
 import torch.optim as optim
 from torch.utils.data import DataLoader
-from model_builder import MoCo
+
 from tqdm import tqdm
 import argparse
 import os
 import json
 
-from finetune.classification_dataset import get_classification_data_loader
+from model_builder import MoCo
+
+from classification_dataset import get_classification_data_loader
 
 from dataset_loader import get_moco_medical_loader
 from utils import set_seed, save_state, print_and_log
@@ -54,7 +56,7 @@ def run_moco_training(model,
             loop.set_postfix({'loss': loss.item()})
 
             # Print loss with datetime
-            print_and_log(f'Epoch {epoch}, Loss: {loss.item():.4f}', log_file=log_file)
+            # print_and_log(f'Epoch {epoch}, Loss: {loss.item():.4f}', log_file=log_file)
 
         # Scheduler step: simple warmup handling
         if epoch < warmup_epochs:
@@ -101,10 +103,10 @@ def main(args):
     # ---------------------------------------
     # Get training loader
     # ---------------------------------------
-    print_and_log(f"Creating MoCo medical image Train DataLoader... : from {args.csv_path}", log_file=log_file)
+    print_and_log(f"Creating MoCo medical image Train DataLoader... : from {args.train_csv_path}", log_file=log_file)
     # Unlabeled dataset for MoCo pretraining
     train_loader = get_moco_medical_loader(
-        csv_path=args.csv_path,
+        csv_path=args.train_csv_path,
         root_dir=args.root_dir,
         batch_size=args.batch_size,
         num_workers=args.num_workers
@@ -176,9 +178,6 @@ def main(args):
     # ---------------------------------------
     # Get test loader
     print_and_log("Starting MoCo backbone testing...", log_file=log_file)
-    
-    # Derive test CSV path from train CSV path
-    test_csv_path = args.csv_path.replace('train', 'test')
 
     # Get training and testing loaders - for linear evaluation
     # Labeled dataset for linear evaluation
@@ -192,7 +191,7 @@ def main(args):
     )
     linear_test_loader = get_classification_data_loader(
         data_split_type='test',
-        CSV_PATH=test_csv_path, # Note: This is derived from train CSV path
+        CSV_PATH=args.test_csv_path,
         ROOT_DIR=args.root_dir,
         batch_size=args.batch_size,
         num_workers=args.num_workers,
@@ -225,6 +224,7 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="MoCo Medical Encoder Training")
     # Should be set
     parser.add_argument('--train_csv_path', type=str, default='train.csv', help='Train CSV file with image paths')
+    parser.add_argument('--test_csv_path', type=str, default='test.csv', help='Test CSV file with image paths')
     parser.add_argument('--root_dir', type=str, default='/path/to/dataset', help='Root directory for images')
     parser.add_argument('--artifact_root', type=str, default='./artifacts/', help='Directory for checkpoints')
     parser.add_argument('--test_num_classes', type=int, default=2, help='Number of classes for testing classification')
