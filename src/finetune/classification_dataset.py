@@ -96,12 +96,15 @@ def get_classification_data_loader(data_split_type, CSV_PATH, ROOT_DIR, batch_si
         transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225])
     ])
 
+    # Image pathing update
+    UPDATED_ROOT_DIR = os.path.join(ROOT_DIR, data_split_type)
+
     # Load the Classification Dataset
     print(f"Loading {data_split_type} dataset...")
     print("CSV:", CSV_PATH)
-    print(f" * Images - {data_split_type.capitalize()} Root Directory:", ROOT_DIR + f"/{data_split_type}")
+    print(f" * Images - {data_split_type.capitalize()} Root Directory:", UPDATED_ROOT_DIR)
 
     # Create Dataset
-    dataset = PneumoniaClassificationDataset(CSV_PATH, root_dir=ROOT_DIR, transform=transform, label_col=label_col)
+    dataset = PneumoniaClassificationDataset(CSV_PATH, root_dir=UPDATED_ROOT_DIR, transform=transform, label_col=label_col)
 
     return DataLoader(dataset, batch_size=batch_size, shuffle=True, num_workers=num_workers)
