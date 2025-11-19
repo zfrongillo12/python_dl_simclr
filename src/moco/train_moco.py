@@ -71,10 +71,11 @@ def run_moco_training(model,
 
         # Save checkpoint every 10 epochs
         if (epoch + 1) % 10 == 0:
-            print_and_log(f'Saving checkpoint at epoch {epoch+1}', log_file=log_file)
+            model_checkpoint_path = f'{artifact_root}/moco_checkpoint_epoch_{epoch+1}.pth'
+            print_and_log(f'Saving checkpoint at epoch {epoch+1}; {model_checkpoint_path}', log_file=log_file)
             os.makedirs(artifact_root, exist_ok=True)
-            save_state(f'{artifact_root}/moco_checkpoint_epoch_{epoch+1}.pth', model, optimizer, epoch)
-        
+            save_state(model_checkpoint_path, model, optimizer, epoch)
+
         # End of epoch: save training stats
         train_stats.append({'epoch': epoch, 'loss': loss.item()})
 
@@ -171,7 +172,7 @@ def main(args):
     print_and_log(f"Saved pretrained encoder to {model_output_path}", log_file=log_file)
 
     # Save training stats
-    save_stats(train_stats, args.artifact_root + '/train_stats.json', 'training', log_file=log_file)
+    save_stats(train_stats, args.artifact_root + '/pretrain_stats_training.json', 'training', log_file=log_file)
 
     # ---------------------------------------
     # Run Testing
@@ -183,7 +184,7 @@ def main(args):
     # Labeled dataset for linear evaluation
     linear_train_loader = get_classification_data_loader(
         data_split_type='train',
-        CSV_PATH=args.train_csv,
+        CSV_PATH=args.train_csv_path,
         ROOT_DIR=args.root_dir,
         batch_size=args.batch_size,
         num_workers=args.num_workers,
@@ -204,7 +205,7 @@ def main(args):
         model,
         linear_train_loader,
         linear_test_loader,
-        device='cuda',
+        device=device,
         num_classes=args.test_num_classes,
         log_file=test_log_file
     )
@@ -231,8 +232,10 @@ if __name__ == "__main__":
     
     # Optional
     parser.add_argument('--batch_size', type=int, default=32, help='Batch size')
-    parser.add_argument('--n_epochs', type=int, default=200, help='Number of epochs')
+    parser.add_argument('--n_epochs', type=int, default=200, help='Number of epochs for backbone training')
+    parser.add_argument('--n_epochs_cls', type=int, default=30, help='Number of epochs for test linear classification training')
     parser.add_argument('--out_model_name', type=str, default='moco_resnet50_encoder.pth', help='Output filename for encoder')
+    parser.add_argument('--label_col', type=str, default='Pneumonia', help='Label column name in CSV for classification dataset')
 
     # Hyperparameters that can be tuned
     parser.add_argument('--device', type=str, default=None, help='Device to use (cuda/cpu)')
