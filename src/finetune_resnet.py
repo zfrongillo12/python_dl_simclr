@@ -103,7 +103,7 @@ def run_testing(backbone, test_loader, device, criterion, dt, log_file, artifact
 
     return
 
-def run_finetune_training(backbone, train_loader, val_loader, device, lr, n_epochs, log_file=None, weight_decay=1e-5, n_epochs_stop=4):
+def run_finetune_training(backbone, train_loader, val_loader, device, lr, n_epochs, log_file=None, weight_decay=1e-5, n_epochs_stop=4, artifact_root='./'):
     # Define loss and optimizer
     criterion = nn.CrossEntropyLoss()
     optimizer = optim.Adam([
@@ -156,7 +156,7 @@ def run_finetune_training(backbone, train_loader, val_loader, device, lr, n_epoc
 
         # Save intermediate model every 5 epochs
         if (epoch + 1) % 5 == 0:
-            checkpoint_path = f'finetuned_model_epoch_{epoch+1}.pth'
+            checkpoint_path = os.path.join(artifact_root, f'finetuned_model_epoch_{epoch+1}.pth')
             torch.save({'model_state': backbone.state_dict()}, checkpoint_path)
             print_and_log(f'Saved checkpoint: {checkpoint_path}', log_file)
 
@@ -241,7 +241,7 @@ def main(args):
     # ----------------------------------------------------
     # Run finetuning
     print_and_log("Starting finetuning...", log_file)
-    backbone, train_stats = run_finetune_training(backbone, train_loader, val_loader, args.device, args.lr, args.n_epochs, log_file=log_file)
+    backbone, train_stats = run_finetune_training(backbone, train_loader, val_loader, args.device, args.lr, args.n_epochs, log_file=log_file, artifact_root=args.artifact_root)
     print_and_log("Finetuning complete.", log_file)
 
     # Save training stats to pickle
