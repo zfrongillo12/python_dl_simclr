@@ -107,6 +107,7 @@ def main(args):
     print_and_log(f"Creating MoCo medical image Train DataLoader... : from {args.train_csv_path}", log_file=log_file)
     # Unlabeled dataset for MoCo pretraining
     train_loader = get_moco_medical_loader(
+        data_split_type='train',
         csv_path=args.train_csv_path,
         root_dir=args.root_dir,
         batch_size=args.batch_size,

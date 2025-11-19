@@ -58,7 +58,7 @@ def collate_fn(batch):
     return im_q, im_k
 
 
-def get_moco_medical_loader(csv_path, root_dir, batch_size=64, num_workers=4):
+def get_moco_medical_loader(csv_path, root_dir, batch_size=64, num_workers=4, data_split_type='train'):
     """
     Creates a MoCo DataLoader for medical images using a CSV file.
     Unlabeled dataset for MoCo pretraining.
@@ -85,7 +85,8 @@ def get_moco_medical_loader(csv_path, root_dir, batch_size=64, num_workers=4):
 
     # MoCo: Two crops transform
         # Use base augmentation to create two, random different views to create the MedicalImageDataset
-    dataset = MedicalImageDataset(csv_path=csv_path, root_dir=root_dir, transform=MoCoTwoCropsTransform(augmentation))
+    img_root_dir = os.path.join(root_dir, data_split_type)
+    dataset = MedicalImageDataset(csv_path=csv_path, root_dir=img_root_dir, transform=MoCoTwoCropsTransform(augmentation))
 
     # Print size of dataset
     print(f"Training Dataset size: {len(dataset)} images")
