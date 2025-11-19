@@ -69,10 +69,10 @@ def get_moco_medical_loader(csv_path, root_dir, batch_size=64, num_workers=4, da
     """
     # MoCo v2-style augmentations (tuned for medical images: less color jitter optional)
     # Inventory of augmentations inventory available for contrastive transformations
+    # No orientation breaking augmentations (e.g., no vertical flip)
     augmentation = transforms.Compose([
         transforms.RandomResizedCrop(224, scale=(0.8, 1.0)),
         transforms.RandomHorizontalFlip(),
-        transforms.RandomVerticalFlip(),
         transforms.RandomRotation(degrees=15),
         transforms.RandomApply([transforms.ColorJitter(
             brightness=0.1, contrast=0.1, saturation=0.1, hue=0.02

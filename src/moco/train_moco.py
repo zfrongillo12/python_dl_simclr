@@ -7,11 +7,16 @@ import argparse
 import os
 import json
 
+# ResNet50
 from model_builder import MoCo
+from dataset_loader import get_moco_medical_loader
+
+# ViT
+from VIT.model_builder import MoCo as MoCo_ViT
+from VIT.dataset_loader import get_moco_medical_loader as get_moco_medical_loader_vit
 
 from classification_dataset import get_classification_data_loader
 
-from dataset_loader import get_moco_medical_loader
 from utils import set_seed, save_state, print_and_log
 from test_moco import run_moco_testing
 
@@ -106,38 +111,71 @@ def main(args):
     # ---------------------------------------
     print_and_log(f"Creating MoCo medical image Train DataLoader... : from {args.train_csv_path}", log_file=log_file)
     # Unlabeled dataset for MoCo pretraining
-    train_loader = get_moco_medical_loader(
-        data_split_type='train',
-        csv_path=args.train_csv_path,
-        root_dir=args.root_dir,
-        batch_size=args.batch_size,
-        num_workers=args.num_workers
-    )
+    if args.model_type == 'VIT':
+        train_loader = get_moco_medical_loader_vit(
+            data_split_type='train',
+            csv_path=args.train_csv_path,
+            root_dir=args.root_dir,
+            batch_size=args.batch_size,
+            num_workers=args.num_workers
+        )
+    else:
+        train_loader = get_moco_medical_loader(
+            data_split_type='train',
+            csv_path=args.train_csv_path,
+            root_dir=args.root_dir,
+            batch_size=args.batch_size,
+            num_workers=args.num_workers
+        )
 
     # ---------------------------------------
     # Model Setup - MoCo
     # ---------------------------------------
-    # Use ResNet50 backbone is instantiated by MoCo
-    # by default, no pretraining should be applied
-    model = MoCo(dim=args.dim, K=args.K, m=args.m, T=args.T, pretrained=args.pretrained_imagenet, device=device)
-    model.to(device)
+    if args.model_type == 'VIT':
+        print_and_log("Using ViT backbone for MoCo", log_file=log_file)
+        model = MoCo_ViT(dim=args.dim, K=args.K, m=args.m, T=args.T, pretrained=args.pretrained_imagenet, device=device)
+        model.to(device)
 
-    # LR scaled to batch size (Scaling Rule for MoCo): lr_base * (batch_size / 256)
-    # LR Scale -> Base is 256; adjusted for smaller batch sizes
-    base_lr = args.base_lr * (args.batch_size / 256)
-    optimizer = optim.SGD(
-        list(model.encoder_q.parameters()) + list(model.mlp_q.parameters()),
-        lr=base_lr,
-        momentum=args.momentum,
-        weight_decay=args.weight_decay
-    )
+        base_lr = 1e-4 # Starting point
+        effective_lr = base_lr * (args.batch_size ** 0.5 / 256 ** 0.5)
 
-    # Warmup (linear) for the first 25 epochs
-    # Cosine annealing scheduler
-    scheduler_cos = torch.optim.lr_scheduler.CosineAnnealingLR(
-        optimizer,
-        T_max=max(1, args.n_epochs - args.warmup_epochs)
-    )
+        optimizer = torch.optim.AdamW(
+            list(model.encoder_q.parameters()) + list(model.mlp_q.parameters()),
+            lr=effective_lr,
+            weight_decay=0.05,     # ViT default WD
+            betas=(0.9, 0.999)     # standard
+        )
+
+        warmup_epochs = 30
+        # Warmup (linear) for the first 25 epochs
+        # Cosine annealing scheduler
+        scheduler_cos = torch.optim.lr_scheduler.CosineAnnealingLR(
+            optimizer,
+            T_max=max(1, args.n_epochs - warmup_epochs)
+        )
+    else:
+        print_and_log("Using ResNet50 backbone for MoCo", log_file=log_file)
+        # Use ResNet50 backbone is instantiated by MoCo
+        # by default, no pretraining should be applied
+        model = MoCo(dim=args.dim, K=args.K, m=args.m, T=args.T, pretrained=args.pretrained_imagenet, device=device)
+        model.to(device)
+
+        # LR scaled to batch size (Scaling Rule for MoCo): lr_base * (batch_size / 256)
+        # LR Scale -> Base is 256; adjusted for smaller batch sizes
+        base_lr = args.base_lr * (args.batch_size / 256)
+        optimizer = optim.SGD(
+            list(model.encoder_q.parameters()) + list(model.mlp_q.parameters()),
+            lr=base_lr,
+            momentum=args.momentum,
+            weight_decay=args.weight_decay
+        )
+
+        # Warmup (linear) for the first 25 epochs
+        # Cosine annealing scheduler
+        scheduler_cos = torch.optim.lr_scheduler.CosineAnnealingLR(
+            optimizer,
+            T_max=max(1, args.n_epochs - args.warmup_epochs)
+        )
 
     # ---------------------------------------
     # Training Loop
@@ -230,7 +268,8 @@ if __name__ == "__main__":
     parser.add_argument('--test_csv_path', type=str, default='test.csv', help='Test CSV file with image paths')
     parser.add_argument('--root_dir', type=str, default='/path/to/dataset', help='Root directory for images')
     parser.add_argument('--artifact_root', type=str, default='./artifacts/', help='Directory for checkpoints')
-    
+    parser.add_argument('--model_type', type=str, default='ResNet50', help='Model type for MoCo (ResNet50 or VIT)')
+
     # For testing
     parser.add_argument('--test_num_classes', type=int, default=2, help='Number of classes for testing classification')
     parser.add_argument('--linear_n_epochs', type=int, default=30, help='Number of epochs for test linear classification training')
