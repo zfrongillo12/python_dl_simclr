@@ -102,6 +102,7 @@ def main(args):
     # Get training loader
     # ---------------------------------------
     print_and_log(f"Creating MoCo medical image Train DataLoader... : from {args.csv_path}", log_file=log_file)
+    # Unlabeled dataset for MoCo pretraining
     train_loader = get_moco_medical_loader(
         csv_path=args.csv_path,
         root_dir=args.root_dir,
@@ -179,7 +180,8 @@ def main(args):
     # Derive test CSV path from train CSV path
     test_csv_path = args.csv_path.replace('train', 'test')
 
-    # Get training and testing loaders - for linear evaluation (classification dataset labels needed)
+    # Get training and testing loaders - for linear evaluation
+    # Labeled dataset for linear evaluation
     linear_train_loader = get_classification_data_loader(
         data_split_type='train',
         CSV_PATH=args.train_csv,
