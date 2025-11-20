@@ -25,7 +25,6 @@ class MoCo(nn.Module):
             print("Not using pretrained weights for ResNet50: Encoder initialized randomly")
             self.encoder_q = resnet50(weights=None)
 
-        # Not sure about this
         # Projection head (MLP)
         # !! Should remove final FC layer from ResNet50 !!
         feat_dim = self.encoder_q.fc.in_features
@@ -84,6 +83,7 @@ class MoCo(nn.Module):
         """
         for param_q, param_k in zip(self.encoder_q.parameters(), self.encoder_k.parameters()):
             param_k.data = param_k.data * self.m + param_q.data * (1. - self.m)
+
         for param_q, param_k in zip(self.mlp_q.parameters(), self.mlp_k.parameters()):
             param_k.data = param_k.data * self.m + param_q.data * (1. - self.m)
 

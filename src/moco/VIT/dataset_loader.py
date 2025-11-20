@@ -7,7 +7,8 @@ import os
 
 class MoCoTwoCropsTransform:
     """
-    Take one image -> return two randomly augmented images (q, k).
+    Take one image -> return two randomly augmented images.
+    This is used in MoCo for contrastive learning; produces the positive pairs (q,k) - query view and positive key
     """
     def __init__(self, base_transform):
         self.base_transform = base_transform
@@ -26,8 +27,7 @@ class MedicalImageDataset(Dataset):
     def __init__(self, csv_path, root_dir="", transform=None):
         print("Loading dataset from:", csv_path)
         self.df = pd.read_csv(csv_path)
-
-        if "Path" not in self.df.columns:
+        if 'Path' not in self.df.columns:
             raise ValueError("CSV must contain a 'Path' column")
 
         self.paths = self.df["Path"].tolist()
@@ -38,19 +38,17 @@ class MedicalImageDataset(Dataset):
         return len(self.paths)
 
     def __getitem__(self, idx):
-        # Full path
+        # Combine root + file path
         img_path = os.path.join(self.root_dir, str(self.paths[idx]))
 
-        # Robust load
+        # Load as PIL image with exception handling
         try:
             img = Image.open(img_path).convert("RGB")
         except Exception as e:
             print(f"Could not load: {img_path}. Error: {e}")
-            # Return black image as fallback
-            img = Image.new("RGB", (224, 224), (0, 0, 0))
 
         if self.transform:
-            im_q, im_k = self.transform(img)
+            im_q, im_k = self.transform(img) # Two crops returned
             return im_q, im_k
 
         # Fallback: return normalized tensors
@@ -60,24 +58,23 @@ class MedicalImageDataset(Dataset):
 
 def collate_fn(batch):
     """
-    Collate for MoCo: stacks q and k batches separately.
+    Custom collate function to handle batches of (im_q, im_k) tuples.
     """
     im_q = torch.stack([b[0] for b in batch], dim=0)
     im_k = torch.stack([b[1] for b in batch], dim=0)
     return im_q, im_k
 
 
-def get_moco_medical_loader(csv_path, root_dir,
-                            batch_size=64, num_workers=4,
-                            data_split_type='train'):
+def get_moco_medical_loader(csv_path, root_dir, batch_size=64, num_workers=4,data_split_type='train'):
     """
-    Creates a MoCo DataLoader for medical images.
+    Creates a MoCo DataLoader for medical images (ViT) compatible using a CSV file.
     """
     print(f"Creating MoCo DataLoader for {data_split_type} data...")
     print(f"CSV Path: {csv_path}")
     print(f"Image Root Dir: {root_dir}")
 
-    # ==== MoCo (ViT/CNN compatible) augmentations ====
+    # ==== MoCo (ViT) augmentations ====
+    # Need to be less aggressive than ResNet50 augmentations
     augmentation = transforms.Compose([
         transforms.RandomResizedCrop(224, scale=(0.7, 1.0)),
         transforms.RandomHorizontalFlip(),
@@ -106,9 +103,10 @@ def get_moco_medical_loader(csv_path, root_dir,
         transform=MoCoTwoCropsTransform(augmentation)
     )
 
+    # Print size of dataset
     print(f"Training Dataset size: {len(dataset)} images")
 
-    # ==== Dataloader ====
+    # Create DataLoader
     drop_last = (len(dataset) % batch_size != 0)
 
     loader = DataLoader(

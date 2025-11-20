@@ -7,10 +7,10 @@ import copy
 
 class MoCo(nn.Module):
     """
+    Build a MoCo encoder: query encoder & momentum-updated key encoder
     MoCo with Vision Transformer backbone (ViT-B/16)
     """
-    def __init__(self, dim=128, K=65536, m=0.999, T=0.2,
-                 pretrained=False, device='cuda'):
+    def __init__(self, dim=128, K=65536, m=0.999, T=0.2, pretrained=False, device='cuda'):
         super().__init__()
         self.device = device
 
@@ -29,7 +29,7 @@ class MoCo(nn.Module):
         feat_dim = self.encoder_q.heads.head.in_features
         self.encoder_q.heads = nn.Identity()
 
-        # Projection MLP
+        # MLP for projection
         self.mlp_q = nn.Sequential(
             nn.Linear(feat_dim, 2048),
             nn.BatchNorm1d(2048),
@@ -70,7 +70,9 @@ class MoCo(nn.Module):
 
     @torch.no_grad()
     def momentum_update_key_encoder(self):
-        # EMA update for key encoder
+        """
+        Momentum update for key encoder parameters
+        """
         for param_q, param_k in zip(self.encoder_q.parameters(), self.encoder_k.parameters()):
             param_k.data = param_k.data * self.m + param_q.data * (1 - self.m)
 
@@ -79,6 +81,9 @@ class MoCo(nn.Module):
 
     @torch.no_grad()
     def dequeue_and_enqueue(self, keys):
+        """
+        Update FIFO queue with new keys
+        """
         batch_size = keys.shape[0]
         ptr = int(self.queue_ptr)
 
@@ -87,22 +92,22 @@ class MoCo(nn.Module):
         self.queue_ptr[0] = ptr
 
     def forward(self, im_q, im_k):
-        # Query pathway
+        # Compute query features
         q = self.encoder_q(im_q)
         q = self.mlp_q(q)
         q = F.normalize(q, dim=1)
 
-        # Key pathway
+        # Compute key features
         with torch.no_grad():
             self.momentum_update_key_encoder()
             k = self.encoder_k(im_k)
             k = self.mlp_k(k)
             k = F.normalize(k, dim=1)
 
-        # Positive logits
+        # Positive logits: q*k
         pos = torch.einsum('nc,nc->n', q, k).unsqueeze(-1)
 
-        # Negative logits
+        # Negative logits: q*queue
         neg = torch.einsum('nc,ck->nk', q, self.queue.clone().detach())
 
         logits = torch.cat([pos, neg], dim=1)

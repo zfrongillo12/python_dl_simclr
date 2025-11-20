@@ -105,17 +105,16 @@ def run_testing(backbone, test_loader, device, criterion, dt, log_file, artifact
 
     return
 
-def run_finetune_training(backbone, train_loader, val_loader, device, lr, n_epochs, log_file=None, 
-                          weight_decay=1e-5, n_epochs_stop=5, artifact_root='./', subtitle="",
-                          gradient_clip_value=True, max_norm=1):
+def run_finetune_training(backbone, train_loader, val_loader, device, lr, n_epochs, log_file=None, weight_decay=1e-5, n_epochs_stop=5, artifact_root='./', subtitle=""):
     # Define loss and optimizer
     criterion = nn.CrossEntropyLoss()
-    optimizer = optim.SGD([
-        {"params": backbone.layer2.parameters(), "lr": 5e-5},
-        {"params": backbone.layer3.parameters(), "lr": 5e-5},
-        {"params": backbone.layer4.parameters(), "lr": 5e-5},
-        {"params": backbone.fc.parameters(),    "lr": 1e-3},
-    ], momentum=0.9, weight_decay=weight_decay)
+    # optimizer = optim.SGD([
+    #     {"params": backbone.layer3.parameters(), "lr": 5e-4},
+    #     {"params": backbone.layer4.parameters(), "lr": 5e-4},
+    #     {"params": backbone.fc.parameters(),    "lr": 1e-2},
+    # ], momentum=0.9, weight_decay=weight_decay)
+    # Frozen
+    optimizer = optim.SGD(backbone.fc.parameters(), lr=0.001, momentum=0.9)
     scheduler = torch.optim.lr_scheduler.CosineAnnealingLR(optimizer, T_max=n_epochs)
 
     # Accumulate training stats
@@ -150,8 +149,6 @@ def run_finetune_training(backbone, train_loader, val_loader, device, lr, n_epoc
             
             optimizer.zero_grad()
             loss.backward()
-            if gradient_clip_value is not None:
-                torch.nn.utils.clip_grad_norm_(backbone.parameters(), max_norm)
             optimizer.step()
             epoch_loss += loss.item()
             num_batches += 1
@@ -249,10 +246,13 @@ def main(args):
     except Exception:
         backbone = resnet50(pretrained=False)
 
+    # Freeze the updates to the gradient weights - backbone
+    for param in backbone.parameters():
+        param.requires_grad = False
+
+    # Add Simple Head - Linear Classifier
     # Modify final layer for NUM_CLASSES
-    in_features = backbone.fc.in_features # Get input features of final layer of backbone
-    print_and_log(f"Backbone final layer in_features: {in_features}", log_file)
-    # Replace final layer with MLP for NUM_CLASSES
+    in_features = backbone.fc.in_features
     backbone.fc = nn.Linear(in_features, args.num_classes)
     backbone.to(args.device)
 
@@ -275,9 +275,8 @@ def main(args):
     print_and_log(f'Loaded pretrained encoder. missing keys: {missing}, unexpected: {unexpected}', log_file)
 
     # Freeze backbone layers - 70/80% of layers frozen
-    for name, param in backbone.named_parameters():
-        if not ("layer2" in name or "layer3" in name or "layer4" in name or "fc" in name):
-            param.requires_grad = False
+    
+
 
     # ----------------------------------------------------
     # Finetuning

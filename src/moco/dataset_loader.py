@@ -18,6 +18,7 @@ class MoCoTwoCropsTransform:
         k = self.base_transform(x)
         return q, k
 
+
 class MedicalImageDataset(Dataset):
     """
     CSV file with one column: 'Path'
@@ -43,7 +44,7 @@ class MedicalImageDataset(Dataset):
         img = Image.open(img_path).convert("RGB")  # medical images usually grayscale -> convert to RGB
 
         if self.transform:
-            im_q, im_k = self.transform(img)  # Two crops returned
+            im_q, im_k = self.transform(img) # Two crops returned
             return im_q, im_k
 
         return img, img
