@@ -169,6 +169,7 @@ def run_finetune_training(backbone, train_loader, val_loader, device, lr, n_epoc
         if len(train_stats) > n_epochs_stop:
             recent = [s['val_acc'] for s in train_stats[-(n_epochs_stop+1):]]
             if all(recent[i] <= recent[i-1] for i in range(1, len(recent))):
+                print_and_log(f'Early stopping at epoch {epoch} due to no improvement in validation accuracy for {n_epochs_stop} epochs.', log_file)
                 break
         
         # Step the scheduler
@@ -183,8 +184,9 @@ def run_finetune_training(backbone, train_loader, val_loader, device, lr, n_epoc
     print_and_log("Finetuning complete.", log_file)
 
     # Save finetuned model
-    torch.save({'model_state': backbone.state_dict()}, 'finetuned_model.pth')
-    print_and_log('Saved finetuned_model.pth', log_file)
+    model_path = os.path.join(artifact_root, f'{subtitle}_finetuned_model.pth')
+    torch.save({'model_state': backbone.state_dict()}, model_path)
+    print_and_log(f'Saved {model_path}', log_file)
     return backbone, train_stats
 
 # ======================= Main Function ==========================
