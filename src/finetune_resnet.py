@@ -12,6 +12,8 @@ from tqdm import tqdm
 import argparse
 import pickle
 
+from copy import deepcopy
+
 from sklearn.metrics import classification_report
 
 from sklearn.metrics import confusion_matrix
@@ -103,7 +105,7 @@ def run_testing(backbone, test_loader, device, criterion, dt, log_file, artifact
 
     return
 
-def run_finetune_training(backbone, train_loader, val_loader, device, lr, n_epochs, log_file=None, weight_decay=1e-5, n_epochs_stop=4, artifact_root='./', subtitle=""):
+def run_finetune_training(backbone, train_loader, val_loader, device, lr, n_epochs, log_file=None, weight_decay=1e-5, n_epochs_stop=5, artifact_root='./', subtitle=""):
     # Define loss and optimizer
     criterion = nn.CrossEntropyLoss()
     optimizer = optim.SGD([
@@ -115,6 +117,11 @@ def run_finetune_training(backbone, train_loader, val_loader, device, lr, n_epoc
 
     # Accumulate training stats
     train_stats = []
+    best_val_acc = 0.0
+    n_epochs_no_improve = 0
+    best_model = None
+
+    print_and_log("Beginning finetuning training...", log_file)
 
     # Training loop
     for epoch in range(n_epochs):
@@ -164,30 +171,35 @@ def run_finetune_training(backbone, train_loader, val_loader, device, lr, n_epoc
         })
         print_and_log(f'Epoch {epoch}: train_acc = {train_acc:.4f} | val_acc = {val_acc:.4f}', log_file)
         print_and_log(f'Epoch {epoch}: train_loss = {avg_train_loss:.4f} | val_loss = {val_loss:.4f}', log_file)
+        
+        # Step the scheduler
+        #scheduler.step()
 
-        # --- Early stopping ---
-        if len(train_stats) > n_epochs_stop:
-            recent = [s['val_acc'] for s in train_stats[-(n_epochs_stop+1):]]
-            if all(recent[i] <= recent[i-1] for i in range(1, len(recent))):
+        # --- Save best model checkpoint ---
+        if val_acc > best_val_acc:
+            best_val_acc = val_acc
+            n_epochs_no_improve = 0
+            best_model = deepcopy(backbone)
+            checkpoint_path = os.path.join(artifact_root, f'{subtitle}_finetuned_model_epoch_{epoch+1}.pth')
+            torch.save({'model_state': backbone.state_dict()}, checkpoint_path)
+            print_and_log(f'New best model at epoch {epoch+1} with val_acc = {val_acc:.4f}', log_file)
+            print_and_log(f'Saved checkpoint: {checkpoint_path}', log_file)
+        else:
+            # --- Early stopping ---
+            print_and_log(f'No improvement in validation accuracy at epoch {epoch+1}.', log_file)
+            n_epochs_no_improve += 1
+            if n_epochs_no_improve >= n_epochs_stop:
                 print_and_log(f'Early stopping at epoch {epoch} due to no improvement in validation accuracy for {n_epochs_stop} epochs.', log_file)
                 break
         
-        # Step the scheduler
-        scheduler.step()
-
-        # Save intermediate model every 5 epochs
-        if (epoch + 1) % 5 == 0:
-            checkpoint_path = os.path.join(artifact_root, f'{subtitle}_finetuned_model_epoch_{epoch+1}.pth')
-            torch.save({'model_state': backbone.state_dict()}, checkpoint_path)
-            print_and_log(f'Saved checkpoint: {checkpoint_path}', log_file)
 
     print_and_log("Finetuning complete.", log_file)
 
     # Save finetuned model
     model_path = os.path.join(artifact_root, f'{subtitle}_finetuned_model.pth')
-    torch.save({'model_state': backbone.state_dict()}, model_path)
+    torch.save({'model_state': best_model.state_dict()}, model_path)
     print_and_log(f'Saved {model_path}', log_file)
-    return backbone, train_stats
+    return best_model, train_stats
 
 # ======================= Main Function ==========================
 def main(args):
