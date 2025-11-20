@@ -118,6 +118,7 @@ def run_finetune_training(backbone, train_loader, val_loader, device, lr, n_epoc
     # Accumulate training stats
     train_stats = []
     best_val_acc = 0.0
+    last_val_acc = 0.0
     n_epochs_no_improve = 0
     best_model = None
 
@@ -175,15 +176,8 @@ def run_finetune_training(backbone, train_loader, val_loader, device, lr, n_epoc
         # Step the scheduler
         #scheduler.step()
 
-        # --- Save best model checkpoint ---
-        if val_acc > best_val_acc:
-            best_val_acc = val_acc
+        if val_acc > last_val_acc:
             n_epochs_no_improve = 0
-            best_model = deepcopy(backbone)
-            checkpoint_path = os.path.join(artifact_root, f'{subtitle}_finetuned_model_epoch_{epoch+1}.pth')
-            torch.save({'model_state': backbone.state_dict()}, checkpoint_path)
-            print_and_log(f'New best model at epoch {epoch+1} with val_acc = {val_acc:.4f}', log_file)
-            print_and_log(f'Saved checkpoint: {checkpoint_path}', log_file)
         else:
             # --- Early stopping ---
             print_and_log(f'No improvement in validation accuracy at epoch {epoch+1}.', log_file)
@@ -191,7 +185,16 @@ def run_finetune_training(backbone, train_loader, val_loader, device, lr, n_epoc
             if n_epochs_no_improve >= n_epochs_stop:
                 print_and_log(f'Early stopping at epoch {epoch} due to no improvement in validation accuracy for {n_epochs_stop} epochs.', log_file)
                 break
-        
+        last_val_acc = val_acc
+
+        # --- Save best model checkpoint ---
+        if val_acc > best_val_acc:
+            best_val_acc = val_acc
+            best_model = deepcopy(backbone)
+            checkpoint_path = os.path.join(artifact_root, f'checkpoint_best_{subtitle}_finetuned_model_epoch.pth')
+            torch.save({'model_state': backbone.state_dict()}, checkpoint_path)
+            print_and_log(f'New best model at epoch {epoch+1} with val_acc = {val_acc:.4f}', log_file)
+            print_and_log(f'Saved checkpoint: {checkpoint_path}', log_file)
 
     print_and_log("Finetuning complete.", log_file)
 
@@ -242,10 +245,11 @@ def main(args):
         backbone = resnet50(pretrained=False)
 
     # Modify final layer for NUM_CLASSES
-    in_features = backbone.fc.in_features
+    in_features = backbone.fc.in_features # Get input features of final layer of backbone
+    print_and_log(f"Backbone final layer in_features: {in_features}", log_file)
+    # Replace final layer with MLP for NUM_CLASSES
     backbone.fc = nn.Linear(in_features, args.num_classes)
     backbone.to(args.device)
-
 
     # Load pretrained encoder weights (state dict with 'encoder_q_state' or raw state dict)
     ckpt = torch.load(args.pretrained_encoder, map_location=args.device)
