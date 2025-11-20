@@ -103,14 +103,15 @@ def run_testing(backbone, test_loader, device, criterion, dt, log_file, artifact
 
     return
 
-def run_finetune_training(backbone, train_loader, val_loader, device, lr, n_epochs, log_file=None, weight_decay=1e-5, n_epochs_stop=4, artifact_root='./'):
+def run_finetune_training(backbone, train_loader, val_loader, device, lr, n_epochs, log_file=None, weight_decay=1e-5, n_epochs_stop=4, artifact_root='./', subtitle=""):
     # Define loss and optimizer
     criterion = nn.CrossEntropyLoss()
-    optimizer = optim.Adam([
-        {"params": backbone.layer3.parameters(), "lr": 5e-6},
-        {"params": backbone.layer4.parameters(), "lr": 5e-6},
-        {"params": backbone.fc.parameters(), "lr": 1e-3},
-    ], weight_decay=weight_decay)
+    optimizer = optim.SGD([
+        {"params": backbone.layer3.parameters(), "lr": 5e-4},
+        {"params": backbone.layer4.parameters(), "lr": 5e-4},
+        {"params": backbone.fc.parameters(),    "lr": 1e-2},
+    ], momentum=0.9, weight_decay=weight_decay)
+    scheduler = torch.optim.lr_scheduler.CosineAnnealingLR(optimizer, T_max=n_epochs)
 
     # Accumulate training stats
     train_stats = []
@@ -120,43 +121,62 @@ def run_finetune_training(backbone, train_loader, val_loader, device, lr, n_epoc
         backbone.train()
 
         # --- Run training ---
+        epoch_loss = 0.0
+        num_batches = 0
+
         train_correct = 0
         train_total = 0
+
         loop = tqdm(train_loader, desc=f'Finetune Epoch {epoch}')
+        
         for images, labels in loop:
+            # Transfer to device
             images = images.to(device)
             labels = labels.to(device)
+
             logits = backbone(images)
             loss = criterion(logits, labels)
+            
             optimizer.zero_grad()
             loss.backward()
             optimizer.step()
-            loop.set_postfix({'loss': loss.item()})
+            epoch_loss += loss.item()
+            num_batches += 1
 
             # Training accuracy calculation
             preds = torch.argmax(logits, dim=1)
             train_correct += (preds == labels).sum().item()
             train_total += labels.size(0)
 
-        train_acc = train_correct / train_total if train_total > 0 else 0.0
+        avg_train_loss = epoch_loss / num_batches
+        train_acc = train_correct / train_total
 
         # --- Run validation ---
         val_acc, val_loss = run_validation(backbone, val_loader, device, criterion)
 
         # Update training stats
-        train_stats.append({'epoch': epoch, 'train_acc': train_acc, 'val_acc': val_acc, 'train_loss': loss.item(), 'val_loss': val_loss})
+        train_stats.append({
+            'epoch': epoch,
+            'train_acc': train_acc,
+            'val_acc': val_acc,
+            'train_loss': avg_train_loss,
+            'val_loss': val_loss
+        })
         print_and_log(f'Epoch {epoch}: train_acc = {train_acc:.4f} | val_acc = {val_acc:.4f}', log_file)
-        print_and_log(f'Epoch {epoch}: train_loss = {loss.item():.4f} | val_loss = {val_loss:.4f}', log_file)
+        print_and_log(f'Epoch {epoch}: train_loss = {avg_train_loss:.4f} | val_loss = {val_loss:.4f}', log_file)
 
-        # Add early stopping based on if validation accuracy decreases for 4 consecutive epochs
-        if epoch >= n_epochs_stop:
-            if all(train_stats[-i]['val_acc'] <= train_stats[-i-1]['val_acc'] for i in range(1, n_epochs_stop + 1)):
-                print_and_log(f'Early stopping at epoch {epoch} due to no improvement in validation accuracy for {n_epochs_stop} consecutive epochs.', log_file)
+        # --- Early stopping ---
+        if len(train_stats) > n_epochs_stop:
+            recent = [s['val_acc'] for s in train_stats[-(n_epochs_stop+1):]]
+            if all(recent[i] <= recent[i-1] for i in range(1, len(recent))):
                 break
+        
+        # Step the scheduler
+        scheduler.step()
 
         # Save intermediate model every 5 epochs
         if (epoch + 1) % 5 == 0:
-            checkpoint_path = os.path.join(artifact_root, f'finetuned_model_epoch_{epoch+1}.pth')
+            checkpoint_path = os.path.join(artifact_root, f'{subtitle}_finetuned_model_epoch_{epoch+1}.pth')
             torch.save({'model_state': backbone.state_dict()}, checkpoint_path)
             print_and_log(f'Saved checkpoint: {checkpoint_path}', log_file)
 
@@ -241,7 +261,7 @@ def main(args):
     # ----------------------------------------------------
     # Run finetuning
     print_and_log("Starting finetuning...", log_file)
-    backbone, train_stats = run_finetune_training(backbone, train_loader, val_loader, args.device, args.lr, args.n_epochs, log_file=log_file, artifact_root=args.artifact_root)
+    backbone, train_stats = run_finetune_training(backbone, train_loader, val_loader, args.device, args.lr, args.n_epochs, log_file=log_file, artifact_root=args.artifact_root, subtitle=args.subtitle)
     print_and_log("Finetuning complete.", log_file)
 
     # Save training stats to pickle
@@ -285,9 +305,12 @@ if __name__ == "__main__":
     parser.add_argument('--root_dir', type=str, default='/path/to/dataset', help='Root directory of images')
     parser.add_argument('--pretrained_encoder', type=str, default='moco_resnet50_encoder.pth', help='Path to pretrained encoder weights')
     parser.add_argument('--artifact_root', type=str, default='./finetune_artifacts', help='Directory to save artifacts')
+    
+    # Dataset
     parser.add_argument('--label_col', type=str, default='Pneumonia', help='Name of the label column in the dataset')
     parser.add_argument('--num_classes', type=int, default=3, help='Number of output classes')
     parser.add_argument('--dataset_title', type=str, default='Pneumonia Classification', help='Title of the dataset for logging')
+    parser.add_argument('--subtitle', type=str, default='resnet50', help='Subtitle for saved models and logs')
 
     # Optional
     parser.add_argument('--batch_size', type=int, default=32, help='Batch size')
