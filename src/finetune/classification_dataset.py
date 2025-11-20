@@ -24,6 +24,9 @@ def check_label_values(df, label_col):
         
         # Remap labels: -1 -> 3, 0 -> 0, 1 -> 1
         df[label_col] = df[label_col].replace({-1: 3, 0: 0, 1: 1})
+
+        # Recalculate unique labels - POST-update for printing
+        unique_labels = df[label_col].unique()
     
         # Sanity check
         print(f"POST-update: Unique labels in column '{label_col}': {unique_labels}")
