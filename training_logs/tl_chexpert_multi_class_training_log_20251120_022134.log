@@ -1,0 +1,128 @@
+Created log file:  /content/drive/MyDrive/Colab Notebooks/7_Py_DL/FP/artifacts/training_log_20251120_022134.txt
+Loading train dataset...
+CSV: /content/drive/MyDrive/Colab Notebooks/7_Py_DL/FP/Data/3_final_project_updated_names_train_transfer.csv
+ * Images - Train Root Directory: /tmp/CheXpert_dataset/CheXpert_reduced_dataset_split_multiclass/train
+Unique labels in column 'Label': [ 0  3 12  8  9  5  2  6 13 10  7  1  4 11]
+Loading val dataset...
+CSV: /content/drive/MyDrive/Colab Notebooks/7_Py_DL/FP/Data/3_final_project_updated_names_val_transfer.csv
+ * Images - Val Root Directory: /tmp/CheXpert_dataset/CheXpert_reduced_dataset_split_multiclass/val
+Unique labels in column 'Label': [ 5  2  3  0  9  7 12  8 10  6 13  4  1 11]
+[2025-11-20 02:21:34] Loading pretrained encoder from: /content/drive/MyDrive/Colab Notebooks/7_Py_DL/FP/artifacts//11_19_Moco_Complete_Resnet50/moco_resnet50_encoder.pth
+[2025-11-20 02:21:34] Detected 'encoder_q_state' in checkpoint.
+[2025-11-20 02:21:34] Loaded pretrained encoder. missing keys: ['fc.weight', 'fc.bias'], unexpected: []
+[2025-11-20 02:21:34] Starting finetuning...
+[2025-11-20 02:21:34] Beginning finetuning training...
+Finetune Epoch 0: 100% 274/274 [00:49<00:00,  5.54it/s]
+[2025-11-20 02:22:29] Epoch 0: train_acc = 0.3371 | val_acc = 0.1761
+[2025-11-20 02:22:29] Epoch 0: train_loss = 2.4054 | val_loss = 2.4403
+[2025-11-20 02:22:29] New best model at epoch 1 with val_acc = 0.1761
+[2025-11-20 02:22:29] Saved checkpoint: /content/drive/MyDrive/Colab Notebooks/7_Py_DL/FP/artifacts/CheXpert_Multiclass_resnet50_finetuned_model_epoch_1.pth
+Finetune Epoch 1: 100% 274/274 [00:49<00:00,  5.54it/s]
+[2025-11-20 02:23:23] Epoch 1: train_acc = 0.3567 | val_acc = 0.1773
+[2025-11-20 02:23:23] Epoch 1: train_loss = 2.2748 | val_loss = 2.4223
+[2025-11-20 02:23:23] New best model at epoch 2 with val_acc = 0.1773
+[2025-11-20 02:23:23] Saved checkpoint: /content/drive/MyDrive/Colab Notebooks/7_Py_DL/FP/artifacts/CheXpert_Multiclass_resnet50_finetuned_model_epoch_2.pth
+Finetune Epoch 2: 100% 274/274 [00:49<00:00,  5.51it/s]
+[2025-11-20 02:24:18] Epoch 2: train_acc = 0.3639 | val_acc = 0.3754
+[2025-11-20 02:24:18] Epoch 2: train_loss = 2.2226 | val_loss = 2.1904
+[2025-11-20 02:24:18] New best model at epoch 3 with val_acc = 0.3754
+[2025-11-20 02:24:18] Saved checkpoint: /content/drive/MyDrive/Colab Notebooks/7_Py_DL/FP/artifacts/CheXpert_Multiclass_resnet50_finetuned_model_epoch_3.pth
+Finetune Epoch 3: 100% 274/274 [00:50<00:00,  5.47it/s]
+[2025-11-20 02:25:13] Epoch 3: train_acc = 0.3845 | val_acc = 0.3814
+[2025-11-20 02:25:13] Epoch 3: train_loss = 2.1248 | val_loss = 2.2421
+[2025-11-20 02:25:13] New best model at epoch 4 with val_acc = 0.3814
+[2025-11-20 02:25:13] Saved checkpoint: /content/drive/MyDrive/Colab Notebooks/7_Py_DL/FP/artifacts/CheXpert_Multiclass_resnet50_finetuned_model_epoch_4.pth
+Finetune Epoch 4: 100% 274/274 [00:50<00:00,  5.46it/s]
+[2025-11-20 02:26:08] Epoch 4: train_acc = 0.4016 | val_acc = 0.3982
+[2025-11-20 02:26:08] Epoch 4: train_loss = 2.0362 | val_loss = 2.0480
+[2025-11-20 02:26:08] New best model at epoch 5 with val_acc = 0.3982
+[2025-11-20 02:26:08] Saved checkpoint: /content/drive/MyDrive/Colab Notebooks/7_Py_DL/FP/artifacts/CheXpert_Multiclass_resnet50_finetuned_model_epoch_5.pth
+Finetune Epoch 5: 100% 274/274 [00:50<00:00,  5.46it/s]
+[2025-11-20 02:27:03] Epoch 5: train_acc = 0.4036 | val_acc = 0.4105
+[2025-11-20 02:27:03] Epoch 5: train_loss = 1.9975 | val_loss = 1.9925
+[2025-11-20 02:27:04] New best model at epoch 6 with val_acc = 0.4105
+[2025-11-20 02:27:04] Saved checkpoint: /content/drive/MyDrive/Colab Notebooks/7_Py_DL/FP/artifacts/CheXpert_Multiclass_resnet50_finetuned_model_epoch_6.pth
+Finetune Epoch 6: 100% 274/274 [00:50<00:00,  5.46it/s]
+[2025-11-20 02:27:59] Epoch 6: train_acc = 0.4186 | val_acc = 0.4034
+[2025-11-20 02:27:59] Epoch 6: train_loss = 1.9499 | val_loss = 2.3802
+[2025-11-20 02:27:59] No improvement in validation accuracy at epoch 7.
+Finetune Epoch 7: 100% 274/274 [00:50<00:00,  5.45it/s]
+[2025-11-20 02:28:54] Epoch 7: train_acc = 0.4206 | val_acc = 0.4245
+[2025-11-20 02:28:54] Epoch 7: train_loss = 1.9320 | val_loss = 2.0728
+[2025-11-20 02:28:54] New best model at epoch 8 with val_acc = 0.4245
+[2025-11-20 02:28:54] Saved checkpoint: /content/drive/MyDrive/Colab Notebooks/7_Py_DL/FP/artifacts/CheXpert_Multiclass_resnet50_finetuned_model_epoch_8.pth
+Finetune Epoch 8: 100% 274/274 [00:50<00:00,  5.46it/s]
+[2025-11-20 02:29:49] Epoch 8: train_acc = 0.4312 | val_acc = 0.4285
+[2025-11-20 02:29:49] Epoch 8: train_loss = 1.8851 | val_loss = 2.0563
+[2025-11-20 02:29:49] New best model at epoch 9 with val_acc = 0.4285
+[2025-11-20 02:29:49] Saved checkpoint: /content/drive/MyDrive/Colab Notebooks/7_Py_DL/FP/artifacts/CheXpert_Multiclass_resnet50_finetuned_model_epoch_9.pth
+Finetune Epoch 9: 100% 274/274 [00:50<00:00,  5.46it/s]
+[2025-11-20 02:30:44] Epoch 9: train_acc = 0.4381 | val_acc = 0.3834
+[2025-11-20 02:30:44] Epoch 9: train_loss = 1.8566 | val_loss = 2.1172
+[2025-11-20 02:30:44] No improvement in validation accuracy at epoch 10.
+Finetune Epoch 10: 100% 274/274 [00:50<00:00,  5.46it/s]
+[2025-11-20 02:31:39] Epoch 10: train_acc = 0.4454 | val_acc = 0.4014
+[2025-11-20 02:31:39] Epoch 10: train_loss = 1.8270 | val_loss = 1.9467
+[2025-11-20 02:31:39] No improvement in validation accuracy at epoch 11.
+Finetune Epoch 11: 100% 274/274 [00:50<00:00,  5.45it/s]
+[2025-11-20 02:32:34] Epoch 11: train_acc = 0.4552 | val_acc = 0.4213
+[2025-11-20 02:32:34] Epoch 11: train_loss = 1.7778 | val_loss = 1.9863
+[2025-11-20 02:32:34] No improvement in validation accuracy at epoch 12.
+Finetune Epoch 12: 100% 274/274 [00:50<00:00,  5.46it/s]
+[2025-11-20 02:33:29] Epoch 12: train_acc = 0.4603 | val_acc = 0.4137
+[2025-11-20 02:33:29] Epoch 12: train_loss = 1.7555 | val_loss = 1.9734
+[2025-11-20 02:33:29] No improvement in validation accuracy at epoch 13.
+[2025-11-20 02:33:29] Early stopping at epoch 12 due to no improvement in validation accuracy for 5 epochs.
+[2025-11-20 02:33:29] Finetuning complete.
+[2025-11-20 02:33:29] Saved /content/drive/MyDrive/Colab Notebooks/7_Py_DL/FP/artifacts/CheXpert_Multiclass_resnet50_finetuned_model.pth
+[2025-11-20 02:33:29] Finetuning complete.
+Loading test dataset...
+CSV: /content/drive/MyDrive/Colab Notebooks/7_Py_DL/FP/Data/3_final_project_updated_names_test_transfer.csv
+ * Images - Test Root Directory: /tmp/CheXpert_dataset/CheXpert_reduced_dataset_split_multiclass/test
+Unique labels in column 'Label': [ 0 10 12  1  5  8  6  2  9  3 13  7  4 11]
+[2025-11-20 02:33:29] Starting testing evaluation...
+[2025-11-20 02:33:38] Test Accuracy: 0.4285
+/usr/local/lib/python3.12/dist-packages/sklearn/metrics/_classification.py:1565: UndefinedMetricWarning: Precision is ill-defined and being set to 0.0 in labels with no predicted samples. Use `zero_division` parameter to control this behavior.
+  _warn_prf(average, modifier, f"{metric.capitalize()} is", len(result))
+/usr/local/lib/python3.12/dist-packages/sklearn/metrics/_classification.py:1565: UndefinedMetricWarning: Precision is ill-defined and being set to 0.0 in labels with no predicted samples. Use `zero_division` parameter to control this behavior.
+  _warn_prf(average, modifier, f"{metric.capitalize()} is", len(result))
+/usr/local/lib/python3.12/dist-packages/sklearn/metrics/_classification.py:1565: UndefinedMetricWarning: Precision is ill-defined and being set to 0.0 in labels with no predicted samples. Use `zero_division` parameter to control this behavior.
+  _warn_prf(average, modifier, f"{metric.capitalize()} is", len(result))
+[2025-11-20 02:33:48] Classification Report:
+              precision    recall  f1-score   support
+
+           0       0.44      0.93      0.59      1895
+           1       0.00      0.00      0.00       153
+           2       0.64      0.08      0.14       207
+           3       0.00      0.00      0.00       364
+           4       0.00      0.00      0.00       108
+           5       0.39      0.34      0.37       451
+           6       0.00      0.00      0.00       107
+           7       0.00      0.00      0.00        59
+           8       0.00      0.00      0.00       217
+           9       0.35      0.13      0.19       421
+          10       0.40      0.34      0.37       485
+          11       0.00      0.00      0.00        35
+          12       0.00      0.00      0.00       225
+          13       0.00      0.00      0.00       281
+
+    accuracy                           0.43      5008
+   macro avg       0.16      0.13      0.12      5008
+weighted avg       0.30      0.43      0.31      5008
+
+[2025-11-20 02:33:48] Confusion Matrix:
+[[1754    0    0    0    0   68    0    0    0   21   52    0    0    0]
+ [ 140    0    0    0    0    8    0    0    0    3    2    0    0    0]
+ [ 165    0   16    0    0   19    0    0    0    1    6    0    0    0]
+ [ 298    0    0    0    0   24    0    0    0   17   25    0    0    0]
+ [  96    0    0    0    0    5    0    0    0    1    6    0    0    0]
+ [ 228    0    4    0    0  155    0    0    0   16   48    0    0    0]
+ [  59    0    1    0    0   13    0    0    0    9   25    0    0    0]
+ [  51    0    0    0    0    2    0    0    0    4    2    0    0    0]
+ [ 192    0    0    0    0   14    0    0    0    1   10    0    0    0]
+ [ 279    0    1    0    0   34    0    0    0   55   52    0    0    0]
+ [ 267    0    2    0    0   33    0    0    0   17  166    0    0    0]
+ [  32    0    0    0    0    1    0    0    0    0    2    0    0    0]
+ [ 213    0    1    0    0    3    0    0    0    2    6    0    0    0]
+ [ 241    0    0    0    0   15    0    0    0   10   15    0    0    0]]
+[2025-11-20 02:33:48] Saved confusion matrix to /content/drive/MyDrive/Colab Notebooks/7_Py_DL/FP/artifacts/confusion_matrix_20251120_022134.png

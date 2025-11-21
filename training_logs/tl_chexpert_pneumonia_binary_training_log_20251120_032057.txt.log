@@ -1,0 +1,135 @@
+Created log file:  /content/drive/MyDrive/Colab Notebooks/7_Py_DL/FP/artifacts/training_log_20251120_032057.txt
+Loading train dataset...
+CSV: /content/drive/MyDrive/Colab Notebooks/7_Py_DL/FP/Data/0_final_project_updated_names_train_transfer_binary.csv
+ * Images - Train Root Directory: /tmp/CheXpert_dataset/CheXpert_reduced_dataset_split_transfer_binary/train
+Unique labels in column 'Pneumonia': [1 0]
+Loading val dataset...
+CSV: /content/drive/MyDrive/Colab Notebooks/7_Py_DL/FP/Data/0_final_project_updated_names_val_transfer_binary.csv
+ * Images - Val Root Directory: /tmp/CheXpert_dataset/CheXpert_reduced_dataset_split_transfer_binary/val
+Unique labels in column 'Pneumonia': [1 0]
+[2025-11-20 03:20:57] Backbone final layer in_features: 2048
+[2025-11-20 03:20:58] Loading pretrained encoder from: /content/drive/MyDrive/Colab Notebooks/7_Py_DL/FP/artifacts//11_19_Moco_Complete_Resnet50/moco_resnet50_encoder.pth
+[2025-11-20 03:20:58] Detected 'encoder_q_state' in checkpoint.
+[2025-11-20 03:20:58] Loaded pretrained encoder. missing keys: ['fc.weight', 'fc.bias'], unexpected: []
+[2025-11-20 03:20:58] Starting finetuning...
+[2025-11-20 03:20:58] Beginning finetuning training...
+Finetune Epoch 0: 100% 242/242 [00:27<00:00,  8.96it/s]
+[2025-11-20 03:21:27] Epoch 0: train_acc = 0.5724 | val_acc = 0.6109
+[2025-11-20 03:21:27] Epoch 0: train_loss = 0.6797 | val_loss = 0.6673
+[2025-11-20 03:21:27] New best model at epoch 1 with val_acc = 0.6109
+[2025-11-20 03:21:27] Saved checkpoint: /content/drive/MyDrive/Colab Notebooks/7_Py_DL/FP/artifacts/checkpoint_best_CheXpert_Pneumonia_binary_resnet50_finetuned_model_epoch.pth
+Finetune Epoch 1: 100% 242/242 [00:26<00:00,  9.12it/s]
+[2025-11-20 03:21:56] Epoch 1: train_acc = 0.5913 | val_acc = 0.6244
+[2025-11-20 03:21:56] Epoch 1: train_loss = 0.6724 | val_loss = 0.6653
+[2025-11-20 03:21:56] New best model at epoch 2 with val_acc = 0.6244
+[2025-11-20 03:21:56] Saved checkpoint: /content/drive/MyDrive/Colab Notebooks/7_Py_DL/FP/artifacts/checkpoint_best_CheXpert_Pneumonia_binary_resnet50_finetuned_model_epoch.pth
+Finetune Epoch 2: 100% 242/242 [00:26<00:00,  9.04it/s]
+[2025-11-20 03:22:25] Epoch 2: train_acc = 0.5894 | val_acc = 0.5683
+[2025-11-20 03:22:25] Epoch 2: train_loss = 0.6717 | val_loss = 0.6728
+[2025-11-20 03:22:25] No improvement in validation accuracy at epoch 3.
+Finetune Epoch 3: 100% 242/242 [00:26<00:00,  9.00it/s]
+[2025-11-20 03:22:54] Epoch 3: train_acc = 0.5991 | val_acc = 0.6109
+[2025-11-20 03:22:54] Epoch 3: train_loss = 0.6674 | val_loss = 0.6652
+Finetune Epoch 4: 100% 242/242 [00:26<00:00,  8.98it/s]
+[2025-11-20 03:23:23] Epoch 4: train_acc = 0.5988 | val_acc = 0.5882
+[2025-11-20 03:23:23] Epoch 4: train_loss = 0.6685 | val_loss = 0.6661
+[2025-11-20 03:23:23] No improvement in validation accuracy at epoch 5.
+Finetune Epoch 5: 100% 242/242 [00:26<00:00,  9.04it/s]
+[2025-11-20 03:23:51] Epoch 5: train_acc = 0.5954 | val_acc = 0.6317
+[2025-11-20 03:23:51] Epoch 5: train_loss = 0.6698 | val_loss = 0.6627
+[2025-11-20 03:23:52] New best model at epoch 6 with val_acc = 0.6317
+[2025-11-20 03:23:52] Saved checkpoint: /content/drive/MyDrive/Colab Notebooks/7_Py_DL/FP/artifacts/checkpoint_best_CheXpert_Pneumonia_binary_resnet50_finetuned_model_epoch.pth
+Finetune Epoch 6: 100% 242/242 [00:26<00:00,  9.02it/s]
+[2025-11-20 03:24:21] Epoch 6: train_acc = 0.5935 | val_acc = 0.5403
+[2025-11-20 03:24:21] Epoch 6: train_loss = 0.6665 | val_loss = 0.6916
+[2025-11-20 03:24:21] No improvement in validation accuracy at epoch 7.
+Finetune Epoch 7: 100% 242/242 [00:26<00:00,  9.02it/s]
+[2025-11-20 03:24:50] Epoch 7: train_acc = 0.6051 | val_acc = 0.6109
+[2025-11-20 03:24:50] Epoch 7: train_loss = 0.6614 | val_loss = 0.6611
+Finetune Epoch 8: 100% 242/242 [00:26<00:00,  9.02it/s]
+[2025-11-20 03:25:18] Epoch 8: train_acc = 0.6054 | val_acc = 0.5991
+[2025-11-20 03:25:18] Epoch 8: train_loss = 0.6608 | val_loss = 0.6656
+[2025-11-20 03:25:18] No improvement in validation accuracy at epoch 9.
+Finetune Epoch 9: 100% 242/242 [00:26<00:00,  9.02it/s]
+[2025-11-20 03:25:47] Epoch 9: train_acc = 0.6041 | val_acc = 0.5955
+[2025-11-20 03:25:47] Epoch 9: train_loss = 0.6611 | val_loss = 0.6767
+[2025-11-20 03:25:47] No improvement in validation accuracy at epoch 10.
+Finetune Epoch 10: 100% 242/242 [00:26<00:00,  9.02it/s]
+[2025-11-20 03:26:16] Epoch 10: train_acc = 0.5987 | val_acc = 0.6244
+[2025-11-20 03:26:16] Epoch 10: train_loss = 0.6651 | val_loss = 0.6634
+Finetune Epoch 11: 100% 242/242 [00:26<00:00,  9.03it/s]
+[2025-11-20 03:26:45] Epoch 11: train_acc = 0.6101 | val_acc = 0.6036
+[2025-11-20 03:26:45] Epoch 11: train_loss = 0.6594 | val_loss = 0.6726
+[2025-11-20 03:26:45] No improvement in validation accuracy at epoch 12.
+Finetune Epoch 12: 100% 242/242 [00:26<00:00,  9.03it/s]
+[2025-11-20 03:27:14] Epoch 12: train_acc = 0.6024 | val_acc = 0.5910
+[2025-11-20 03:27:14] Epoch 12: train_loss = 0.6629 | val_loss = 0.6697
+[2025-11-20 03:27:14] No improvement in validation accuracy at epoch 13.
+Finetune Epoch 13: 100% 242/242 [00:26<00:00,  9.03it/s]
+[2025-11-20 03:27:43] Epoch 13: train_acc = 0.6077 | val_acc = 0.6235
+[2025-11-20 03:27:43] Epoch 13: train_loss = 0.6600 | val_loss = 0.6564
+Finetune Epoch 14: 100% 242/242 [00:26<00:00,  9.02it/s]
+[2025-11-20 03:28:12] Epoch 14: train_acc = 0.6088 | val_acc = 0.6380
+[2025-11-20 03:28:12] Epoch 14: train_loss = 0.6580 | val_loss = 0.6565
+[2025-11-20 03:28:12] New best model at epoch 15 with val_acc = 0.6380
+[2025-11-20 03:28:12] Saved checkpoint: /content/drive/MyDrive/Colab Notebooks/7_Py_DL/FP/artifacts/checkpoint_best_CheXpert_Pneumonia_binary_resnet50_finetuned_model_epoch.pth
+Finetune Epoch 15: 100% 242/242 [00:26<00:00,  9.02it/s]
+[2025-11-20 03:28:41] Epoch 15: train_acc = 0.6105 | val_acc = 0.6244
+[2025-11-20 03:28:41] Epoch 15: train_loss = 0.6561 | val_loss = 0.6625
+[2025-11-20 03:28:41] No improvement in validation accuracy at epoch 16.
+Finetune Epoch 16: 100% 242/242 [00:26<00:00,  9.03it/s]
+[2025-11-20 03:29:10] Epoch 16: train_acc = 0.6152 | val_acc = 0.6326
+[2025-11-20 03:29:10] Epoch 16: train_loss = 0.6562 | val_loss = 0.6574
+Finetune Epoch 17: 100% 242/242 [00:26<00:00,  9.02it/s]
+[2025-11-20 03:29:38] Epoch 17: train_acc = 0.6161 | val_acc = 0.6308
+[2025-11-20 03:29:39] Epoch 17: train_loss = 0.6563 | val_loss = 0.6546
+[2025-11-20 03:29:39] No improvement in validation accuracy at epoch 18.
+Finetune Epoch 18: 100% 242/242 [00:26<00:00,  9.00it/s]
+[2025-11-20 03:30:07] Epoch 18: train_acc = 0.6204 | val_acc = 0.6253
+[2025-11-20 03:30:07] Epoch 18: train_loss = 0.6531 | val_loss = 0.6588
+[2025-11-20 03:30:07] No improvement in validation accuracy at epoch 19.
+Finetune Epoch 19: 100% 242/242 [00:26<00:00,  9.02it/s]
+[2025-11-20 03:30:36] Epoch 19: train_acc = 0.6048 | val_acc = 0.5900
+[2025-11-20 03:30:36] Epoch 19: train_loss = 0.6621 | val_loss = 0.6830
+[2025-11-20 03:30:36] No improvement in validation accuracy at epoch 20.
+Finetune Epoch 20: 100% 242/242 [00:26<00:00,  9.02it/s]
+[2025-11-20 03:31:05] Epoch 20: train_acc = 0.6137 | val_acc = 0.5801
+[2025-11-20 03:31:05] Epoch 20: train_loss = 0.6560 | val_loss = 0.6710
+[2025-11-20 03:31:05] No improvement in validation accuracy at epoch 21.
+Finetune Epoch 21: 100% 242/242 [00:26<00:00,  9.01it/s]
+[2025-11-20 03:31:34] Epoch 21: train_acc = 0.6116 | val_acc = 0.6253
+[2025-11-20 03:31:34] Epoch 21: train_loss = 0.6548 | val_loss = 0.6575
+Finetune Epoch 22: 100% 242/242 [00:26<00:00,  9.00it/s]
+[2025-11-20 03:32:03] Epoch 22: train_acc = 0.6126 | val_acc = 0.6036
+[2025-11-20 03:32:03] Epoch 22: train_loss = 0.6549 | val_loss = 0.6658
+[2025-11-20 03:32:03] No improvement in validation accuracy at epoch 23.
+Finetune Epoch 23: 100% 242/242 [00:26<00:00,  9.00it/s]
+[2025-11-20 03:32:32] Epoch 23: train_acc = 0.6080 | val_acc = 0.6308
+[2025-11-20 03:32:32] Epoch 23: train_loss = 0.6565 | val_loss = 0.6572
+Finetune Epoch 24: 100% 242/242 [00:26<00:00,  9.01it/s]
+[2025-11-20 03:33:01] Epoch 24: train_acc = 0.6161 | val_acc = 0.6217
+[2025-11-20 03:33:01] Epoch 24: train_loss = 0.6589 | val_loss = 0.6622
+[2025-11-20 03:33:01] No improvement in validation accuracy at epoch 25.
+[2025-11-20 03:33:01] Finetuning complete.
+[2025-11-20 03:33:01] Saved /content/drive/MyDrive/Colab Notebooks/7_Py_DL/FP/artifacts/CheXpert_Pneumonia_binary_resnet50_finetuned_model.pth
+[2025-11-20 03:33:01] Finetuning complete.
+Loading test dataset...
+CSV: /content/drive/MyDrive/Colab Notebooks/7_Py_DL/FP/Data/0_final_project_updated_names_test_transfer_binary.csv
+ * Images - Test Root Directory: /tmp/CheXpert_dataset/CheXpert_reduced_dataset_split_transfer_binary/test
+Unique labels in column 'Pneumonia': [0 1]
+[2025-11-20 03:33:01] Starting testing evaluation...
+[2025-11-20 03:33:05] Test Accuracy: 0.6186
+[2025-11-20 03:33:09] Classification Report:
+              precision    recall  f1-score   support
+
+           0       0.60      0.49      0.54      1000
+           1       0.63      0.72      0.68      1210
+
+    accuracy                           0.62      2210
+   macro avg       0.61      0.61      0.61      2210
+weighted avg       0.62      0.62      0.61      2210
+
+[2025-11-20 03:33:09] Confusion Matrix:
+[[491 509]
+ [334 876]]
+[2025-11-20 03:33:09] Saved confusion matrix to /content/drive/MyDrive/Colab Notebooks/7_Py_DL/FP/artifacts/confusion_matrix_20251120_032057.png
