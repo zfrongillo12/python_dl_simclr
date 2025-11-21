@@ -5,6 +5,15 @@ from torchvision.models import resnet50
 
 import copy
 
+"""
+References:
+  * Original MoCo paper: https://arxiv.org/abs/1911.05722
+* Examples in Pytorch:
+  * https://www.analyticsvidhya.com/blog/2020/08/moco-v2-in-pytorch/ 
+  * https://github.com/facebookresearch/moco/blob/main/main_moco.py
+  * https://github.com/facebookresearch/moco/blob/main/moco/builder.py
+"""
+
 class MoCo(nn.Module):
     """
     Build a MoCo encoder: query encoder & momentum-updated key encoder
