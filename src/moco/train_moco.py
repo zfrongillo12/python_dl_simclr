@@ -247,7 +247,8 @@ def main(args):
         device=device,
         linear_n_epochs=args.linear_n_epochs,
         num_classes=args.test_num_classes,
-        log_file=test_log_file
+        log_file=test_log_file,
+        artifact_root=args.artifact_root
     )
     print_and_log("MoCo backbone testing complete!!", log_file=log_file)
 
