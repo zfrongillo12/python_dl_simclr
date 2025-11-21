@@ -1,1 +1,7 @@
 *.pth
+
+__pycache__
+
+training_logs/archive/*
+
+src/moco/run_linear_test_proto
