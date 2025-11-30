@@ -12,8 +12,8 @@ from model_builder import MoCo
 from dataset_loader import get_moco_medical_loader
 
 # ViT
-from VIT.model_builder import MoCo as MoCo_ViT
-from VIT.dataset_loader import get_moco_medical_loader as get_moco_medical_loader_vit
+from VIT_baseline.model_builder import MoCo as MoCo_ViT
+from VIT_baseline.dataset_loader import get_moco_medical_loader as get_moco_medical_loader_vit
 
 from classification_dataset import get_classification_data_loader
 
