@@ -2,6 +2,7 @@ import torch
 import torch.nn as nn
 import torch.nn.functional as F
 import copy
+from copy import deepcopy
 
 # ---------------------------
 # ConvStem -> Patch Embedding
@@ -18,9 +19,9 @@ class ConvPatchEmbed(nn.Module):
         self.embed_dim = embed_dim
 
     def forward(self, x):
-        x = self.proj(x)  # (B, C, H/4, W/4)
+        x = self.proj(x) # (B, C, H/4, W/4)
         B, C, H, W = x.shape
-        x = x.flatten(2).transpose(1, 2)  # (B, num_patches, embed_dim)
+        x = x.flatten(2).transpose(1, 2) # (B, num_patches, embed_dim)
         return x
 
 # ---------------------------
@@ -35,7 +36,7 @@ class TransformerEncoder(nn.Module):
         self.blocks = nn.TransformerEncoder(encoder_layer, num_layers=num_layers)
 
     def forward(self, x):
-        x = self.blocks(x)  # (B, num_patches, embed_dim)
+        x = self.blocks(x) # (B, num_patches, embed_dim)
         return x
 
 # ---------------------------
