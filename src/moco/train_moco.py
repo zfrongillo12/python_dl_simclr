@@ -1,4 +1,6 @@
 import torch
+import torch.nn.functional as F
+
 import torch.optim as optim
 from torch.utils.data import DataLoader
 
@@ -15,12 +17,16 @@ from dataset_loader import get_moco_medical_loader
 from VIT_baseline.model_builder import MoCo as MoCo_ViT
 from VIT_baseline.dataset_loader import get_moco_medical_loader as get_moco_medical_loader_vit
 
+# ViT Hybrid
+from VIT_update_hybrid.model_builder import ViTMoCo as MoCo_ViT_Hybrid
+
 from classification_dataset import get_classification_data_loader
 
 from utils import set_seed, save_state, print_and_log
 from test_moco import run_moco_testing
 
 
+# For ResNet50 and ViT [Case 1 and 3], train function
 def run_moco_training(model,
                       n_epochs,
                       train_loader,
@@ -42,7 +48,7 @@ def run_moco_training(model,
         # Loop on the training data - using tqdm for progress bar
         loop = tqdm(train_loader, desc=f'Epoch {epoch}/{n_epochs - 1}')
 
-        # Training loop - for each batch
+        # Training loop - for each batch (loop represents one batch from train_loader)
         for im_q, im_k in loop:
             im_q = im_q.to(model.device, non_blocking=True)
             im_k = im_k.to(model.device, non_blocking=True)
@@ -86,6 +92,94 @@ def run_moco_training(model,
 
     return model, train_stats
 
+# For ViT Hybrid [Case 2], train function is slightly modified to accommodate different model structure
+def run_moco_training_vit_hybrid(model,
+                      n_epochs,
+                      train_loader,
+                      optimizer,
+                      warmup_epochs,
+                      scheduler_cos,
+                      q_params,
+                      artifact_root="./artifacts/",
+                      base_lr=0.03,
+                      log_file="./artifacts/training_log.txt"):
+    # Start training log
+    print_and_log(f"Starting MoCo ViT Hybrid training for {n_epochs} epochs", log_file=log_file)
+
+    # Accumulate training stats for pretraining
+    train_stats = []
+
+    best_loss = 0
+
+    for epoch in range(n_epochs):
+        # Set model to train mode
+        model.train()
+        # Loop on the training data - using tqdm for progress bar
+        loop = tqdm(train_loader, desc=f'Epoch {epoch}/{n_epochs - 1}')
+
+        running_loss = 0.0
+
+        # Training loop - for each batch (loop represents one batch from train_loader)
+        for im_q, im_k in loop:
+            im_q = im_q.to(model.device, non_blocking=True)
+            im_k = im_k.to(model.device, non_blocking=True)
+
+            # Forward pass
+            logits, labels = model(im_q, im_k)
+            # print(f"logits.shape: {logits.shape}, labels.shape: {labels.shape}")
+            # print(f"logits.device: {logits.device}, labels.device: {labels.device}")
+            # print(f"logits.dtype: {logits.dtype}, labels.dtype: {labels.dtype}")
+            
+            loss = F.cross_entropy(logits, labels)  # compute scalar loss
+
+            optimizer.zero_grad()
+            loss.backward()
+
+            # optional: gradient clipping if needed
+            torch.nn.utils.clip_grad_norm_(q_params, max_norm=3.0)
+            optimizer.step()
+
+            # Update loss (minibatch)
+            running_loss += loss.item()
+
+            # Queue is updated internally in model forward for ViT Hybrid
+
+            # Update progress bar
+            loop.set_postfix({'loss': loss.item()})
+
+        # Scheduler step: simple warmup handling
+        if epoch < warmup_epochs:
+            lr_scale = float(epoch + 1) / float(max(1, warmup_epochs))
+            for pg in optimizer.param_groups:
+                pg['lr'] = base_lr * lr_scale
+        else:
+            scheduler_cos.step()
+
+        # Print loss with datetime
+        avg_running_loss = running_loss / len(train_loader)
+        print_and_log(f'Epoch complete {epoch}, Avg. Running Loss: {avg_running_loss:.6f}', log_file=log_file)
+
+        # Save checkpoint every time the loss improves
+        if avg_running_loss < best_loss or epoch == 0:
+            print_and_log(f'Loss improved from {best_loss:.6f} to {avg_running_loss:.6f}. Saving checkpoint.', log_file=log_file)
+            # Update Loss
+            best_loss = avg_running_loss
+
+            # Save checkpoint
+            model_checkpoint_path = f'{artifact_root}/vit_hybrid_moco_checkpoint_epoch_{epoch+1}.pth'
+            print_and_log(f'Saving checkpoint at epoch {epoch+1}; {model_checkpoint_path}', log_file=log_file)
+            os.makedirs(artifact_root, exist_ok=True)
+            save_state(model_checkpoint_path, model, optimizer, epoch)
+
+        # End of epoch: save training stats
+        train_stats.append({'epoch': epoch, 'loss': avg_running_loss})
+
+    return model, train_stats
+
+
+# ================================================================================
+# Function to save training/testing stats as JSON
+# ================================================================================
 def save_stats(stats, path, stat_type, log_file=None):
     with open(path, 'w') as f:
         json.dump(stats, f)
@@ -131,7 +225,13 @@ def main(args):
     # ---------------------------------------
     # Model Setup - MoCo
     # ---------------------------------------
+    isViTHybrid = (args.model_type == 'VIT_Hybrid')
+    q_params = None
+
     if args.model_type == 'VIT':
+        # ---------------------------------------
+        # Case 1: ViT Backbone
+        # ---------------------------------------
         print_and_log("Using ViT backbone for MoCo", log_file=log_file)
         model = MoCo_ViT(dim=args.dim, K=args.K, m=args.m, T=args.T, pretrained=args.pretrained_imagenet, device=device)
         model.to(device)
@@ -153,7 +253,34 @@ def main(args):
             optimizer,
             T_max=max(1, args.n_epochs - warmup_epochs)
         )
+    elif args.model_type == 'VIT_Hybrid':
+        # ---------------------------------------
+        # Case 2: ViT Hybrid Backbone
+        # ---------------------------------------
+        print_and_log("Using ViT Hybrid backbone for MoCo", log_file=log_file)
+        print_and_log("Note: No option to use pretrained weights; ignoring if set", log_file=log_file)
+        model = MoCo_ViT_Hybrid(proj_dim=args.dim, K=args.K, m=args.m, T=args.T, embed_dim=args.embedding_dim, device=device)
+        model.to(device)
+
+        base_lr = 1e-4 # Starting point
+        # optimizer: update only the query encoder (q_patch, q_vit, q_proj)
+        #q_params = list(model.q_patch.parameters()) + list(model.q_vit.parameters()) + list(model.q_proj.parameters())
+        q_params = (
+            list(model.encoder_q['patch_embed'].parameters()) +
+            list(model.encoder_q['transformer'].parameters()) +
+            list(model.encoder_q_proj.parameters())
+        )
+
+        # Original MoCo used SGD; but AdamW is more common for ViT
+        #optimizer = optim.SGD(q_params, lr=0.03, momentum=0.9, weight_decay=1e-4)
+        optimizer = torch.optim.Adam(q_params, lr=1e-4, weight_decay=1e-5)
+
+        # cosine LR scheduler
+        scheduler_cos = optim.lr_scheduler.CosineAnnealingLR(optimizer, T_max=200)  # T_max = epochs
     else:
+        # ---------------------------------------
+        # Case 3: ResNet50 (CNN) Backbone
+        # ---------------------------------------
         print_and_log("Using ResNet50 backbone for MoCo", log_file=log_file)
         # Use ResNet50 backbone is instantiated by MoCo
         # by default, no pretraining should be applied
@@ -182,17 +309,39 @@ def main(args):
     # ---------------------------------------
 
     # Run encoder training
-    model, train_stats = run_moco_training(
-        model,
-        n_epochs=args.n_epochs,
-        train_loader=train_loader,
-        optimizer=optimizer,
-        warmup_epochs=args.warmup_epochs,
-        scheduler_cos=scheduler_cos,
-        artifact_root=args.artifact_root,
-        base_lr=args.base_lr,
-        log_file=log_file,
-    )
+    if isViTHybrid:
+        # Case 2: ViT Hybrid
+        # Ensure q_params is populated
+        if q_params is None:
+            raise ValueError("q_params is None for ViT Hybrid model; cannot proceed with training.")
+
+        # Run ViT Hybrid specific training function
+        model, train_stats = run_moco_training_vit_hybrid(
+            model,
+            n_epochs=args.n_epochs,
+            train_loader=train_loader,
+            optimizer=optimizer,
+            warmup_epochs=args.warmup_epochs,
+            scheduler_cos=scheduler_cos,
+            q_params=q_params,
+            artifact_root=args.artifact_root,
+            base_lr=base_lr,
+            log_file=log_file,
+        )
+    else:
+        # Case 1 and 3: ViT and ResNet50
+        model, train_stats = run_moco_training(
+            model,
+            n_epochs=args.n_epochs,
+            train_loader=train_loader,
+            optimizer=optimizer,
+            warmup_epochs=args.warmup_epochs,
+            scheduler_cos=scheduler_cos,
+            artifact_root=args.artifact_root,
+            base_lr=base_lr,
+            log_file=log_file,
+        )
+
     print_and_log('MoCo training complete!!', log_file=log_file)
 
     # Save the trained encoder (query backbone + mlp)
@@ -282,6 +431,9 @@ if __name__ == "__main__":
     parser.add_argument('--n_epochs', type=int, default=200, help='Number of epochs for backbone training')
     parser.add_argument('--out_model_name', type=str, default='moco_resnet50_encoder.pth', help='Output filename for encoder')
     parser.add_argument('--label_col', type=str, default='Pneumonia', help='Label column name in CSV for classification dataset')
+    
+    # For ViT Hybrid - [Case 2]
+    parser.add_argument('--embedding_dim', type=int, default=384, help='Embedding dimension for ViT Hybrid backbone')
 
     # Hyperparameters that can be tuned
     parser.add_argument('--device', type=str, default=None, help='Device to use (cuda/cpu)')
