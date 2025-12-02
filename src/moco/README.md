@@ -86,3 +86,18 @@ The output feature vectors are sent to `mlp_q` and `mlp_k` as projection heads
 
 #### Linear Evaluation using MLP
 * Need to send in data that has the labels needed for the downstream image classification task
+
+---
+## About the Files
+
+### Baseline ResNet-50 & VIT-16
+* train_moco.py
+* test_moco.py
+
+Classification dataset (shared)
+* (Copied in src/finetune; as needed by Google Collab)
+* classification_dataset.py
+
+### ViT Hybrid
+* train_moco_vit_hybrid.py
+* test_moco_vit_hybrid.py

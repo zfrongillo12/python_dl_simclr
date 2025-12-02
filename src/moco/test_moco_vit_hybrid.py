@@ -19,6 +19,8 @@ import matplotlib.pyplot as plt
 from VIT_update_hybrid.model_builder import ViTMoCo as MoCo_ViT_Hybrid
 from dataset_loader import get_moco_medical_loader
 
+from VIT_update_hybrid.vit_backbone_wrapper import ViTBackbone
+
 from classification_dataset import get_classification_data_loader
 
 from utils import set_seed, print_and_log, save_stats
@@ -156,41 +158,6 @@ def run_linear_evaluation(backbone, linear_head, train_loader, test_loader, epoc
         
     return test_stats, backbone
 
-
-# -------------------------------
-# Linear Classifier for ViTMoCo
-# -------------------------------
-class LinearClassifier(nn.Module):
-    def __init__(self, encoder, embed_dim, num_classes):
-        super().__init__()
-        self.encoder = encoder
-        self.fc = nn.Linear(embed_dim, num_classes)
-        
-    def forward(self, x):
-        # Pass through patch embedding
-        x = self.encoder['patch_embed'](x)
-        # Pass through transformer encoder
-        x = self.encoder['transformer'](x)
-        # Mean pooling over tokens (assumes shape B x N x embed_dim)
-        x = x.mean(dim=1)
-        # Linear classification
-        x = self.fc(x)
-        return x
-        
-class ViTBackbone(nn.Module):
-    def __init__(self, encoder_q):
-        super().__init__()
-        self.patch_embed = encoder_q['patch_embed']
-        self.transformer = encoder_q['transformer']
-
-    def forward(self, x):
-        x = self.patch_embed(x)         # (B, N, D)
-        x = self.transformer(x)         # (B, N, D)
-
-        # Use CLS token = first token
-        cls = x[:, 0]
-
-        return cls
 
 # ================================================================================
 # Test MoCo backbone
