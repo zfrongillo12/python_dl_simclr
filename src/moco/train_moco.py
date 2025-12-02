@@ -8,7 +8,7 @@ import os
 import json
 
 # ResNet50
-from model_builder import MoCo
+from resnet50_baseline.model_builder import MoCo
 from dataset_loader import get_moco_medical_loader
 
 # ViT

@@ -1,7 +1,7 @@
 import os
 import torch
 from torch.utils.data import DataLoader
-from model_builder import MoCo
+from Git_Project.src.moco.resnet50_baseline.model_builder import MoCo
 
 from utils import print_and_log
 from tqdm import tqdm

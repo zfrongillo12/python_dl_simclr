@@ -199,7 +199,7 @@ def main(args):
     # Save the trained encoder (query backbone + mlp)
     # After training, save only 
     #   1) the encoder_q (used as the backbone for transfer learning)
-    #   2) mlp_q (for further pre-training; but is generally not used for transfer learning)
+    #   2) encoder_q_proj (for further pre-training; but is generally not used for transfer learning)
 
     # Create file name for saving model - use args.out_model_name
     model_output_path = os.path.join(args.artifact_root, args.out_model_name)
@@ -207,7 +207,7 @@ def main(args):
     # Save encoder_q and mlp_q state dicts
     torch.save({
         'encoder_q_state': model.encoder_q.state_dict(),
-        'mlp_q_state': model.mlp_q.state_dict()
+        'encoder_q_proj': model.encoder_q_proj.state_dict()
     }, model_output_path)
     print_and_log(f"Saved pretrained encoder to {model_output_path}", log_file=log_file)
 
