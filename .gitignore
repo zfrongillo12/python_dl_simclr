@@ -4,6 +4,6 @@ __pycache__
 
 training_logs/archive/*
 
-src/moco/run_linear_test_proto
+src/moco/run_linear_test_proto/archive
 
 src/moco/VIT_update_hybrid/archives
