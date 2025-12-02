@@ -13,10 +13,7 @@ import json
 from VIT_update_hybrid.model_builder import ViTMoCo as MoCo_ViT_Hybrid
 from dataset_loader import get_moco_medical_loader
 
-from classification_dataset import get_classification_data_loader
-
-from utils import set_seed, save_state, print_and_log
-from test_moco import run_moco_testing
+from utils import set_seed, save_state, print_and_log, save_stats
 
 # ================================================================================
 # For ViT Hybrid [Case 2], train function is slightly modified to accommodate different model structure
@@ -106,15 +103,6 @@ def run_moco_training_vit_hybrid(model,
 
 
 # ================================================================================
-# Function to save training/testing stats as JSON
-# ================================================================================
-def save_stats(stats, path, stat_type, log_file=None):
-    with open(path, 'w') as f:
-        json.dump(stats, f)
-    print_and_log(f"Saved {stat_type} stats to {path}", log_file=log_file)
-    return
-
-# ================================================================================
 # Main function to parse arguments and run training + testing
 # ================================================================================
 def main(args):
@@ -144,7 +132,6 @@ def main(args):
     # ---------------------------------------
     # Model Setup - MoCo
     # ---------------------------------------
-    isViTHybrid = (args.model_type == 'VIT_Hybrid')
     q_params = None
 
     # ---------------------------------------
@@ -207,56 +194,15 @@ def main(args):
     # Save encoder_q and mlp_q state dicts
     torch.save({
         'encoder_q_state': model.encoder_q.state_dict(),
-        'encoder_q_proj': model.encoder_q_proj.state_dict()
+        'encoder_q_proj': model.encoder_q_proj.state_dict(),
+        'embedding_dim': model.embed_dim
     }, model_output_path)
     print_and_log(f"Saved pretrained encoder to {model_output_path}", log_file=log_file)
 
     # Save training stats
     save_stats(train_stats, args.artifact_root + '/pretrain_stats_training.json', 'training', log_file=log_file)
 
-    # ---------------------------------------
-    # Run Testing
-    # ---------------------------------------
-    """
-    # Get test loader
-    print_and_log("Starting MoCo backbone testing...", log_file=log_file)
-
-    # Get training and testing loaders - for linear evaluation
-    # Labeled dataset for linear evaluation
-    linear_train_loader = get_classification_data_loader(
-        data_split_type='train',
-        CSV_PATH=args.linear_train_csv_path,
-        ROOT_DIR=args.root_dir,
-        batch_size=args.batch_size,
-        num_workers=args.num_workers,
-        label_col=args.label_col
-    )
-    linear_test_loader = get_classification_data_loader(
-        data_split_type='test',
-        CSV_PATH=args.linear_test_csv_path,
-        ROOT_DIR=args.root_dir,
-        batch_size=args.batch_size,
-        num_workers=args.num_workers,
-        label_col=args.label_col
-    )
-
-    # Run testing
-    test_log_file = os.path.join(args.artifact_root, f'moco_testing_log_{dt}.txt')
-    test_stats = run_moco_testing(
-        model,
-        linear_train_loader,
-        linear_test_loader,
-        device=device,
-        linear_n_epochs=args.linear_n_epochs,
-        num_classes=args.test_num_classes,
-        log_file=test_log_file,
-        artifact_root=args.artifact_root
-    )
-    print_and_log("MoCo backbone testing complete!!", log_file=log_file)
-
-    # Save testing stats
-    save_stats(test_stats, args.artifact_root + '/test_stats.json', 'testing', log_file=log_file)
-    """
+    # Testing will be completed in a separate script
 
     return
 

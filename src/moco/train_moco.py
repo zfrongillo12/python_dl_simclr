@@ -17,7 +17,7 @@ from VIT_baseline.dataset_loader import get_moco_medical_loader as get_moco_medi
 
 from classification_dataset import get_classification_data_loader
 
-from utils import set_seed, save_state, print_and_log
+from utils import set_seed, save_state, print_and_log, save_stats
 from test_moco import run_moco_testing
 
 
@@ -85,12 +85,6 @@ def run_moco_training(model,
         train_stats.append({'epoch': epoch, 'loss': loss.item()})
 
     return model, train_stats
-
-def save_stats(stats, path, stat_type, log_file=None):
-    with open(path, 'w') as f:
-        json.dump(stats, f)
-    print_and_log(f"Saved {stat_type} stats to {path}", log_file=log_file)
-    return
 
 # ================================================================================
 # Main function to parse arguments and run training + testing
