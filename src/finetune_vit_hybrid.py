@@ -204,6 +204,7 @@ def run_finetune_training(model, train_loader, val_loader, device, lr, n_epochs,
             best_model = deepcopy(model)
             n_epochs_no_improve = 0
             print_and_log(f"New best model found at epoch {epoch} with val_acc={val_acc:.4f}", log_file)
+            model_path = os.path.join(artifact_root, f'{subtitle}_finetuning_epoch_{epoch}_model.pth')
             torch.save({'model_state': best_model.state_dict()}, model_path)
 
         # Early stopping check
@@ -401,7 +402,7 @@ if __name__ == "__main__":
     parser.add_argument('--label_col', type=str, default='Pneumonia', help='Name of the label column in the dataset')
     parser.add_argument('--num_classes', type=int, default=2, help='Number of output classes')
     parser.add_argument('--dataset_title', type=str, default='Pneumonia Classification', help='Title of the dataset for logging')
-    parser.add_argument('--subtitle', type=str, default='resnet50', help='Subtitle for saved models and logs')
+    parser.add_argument('--subtitle', type=str, default='vit_hybrid', help='Subtitle for saved models and logs')
 
     # Optional
     parser.add_argument('--batch_size', type=int, default=32, help='Batch size')
