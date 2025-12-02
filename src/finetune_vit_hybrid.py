@@ -163,19 +163,18 @@ def run_testing(model, test_loader, device, criterion, dt, log_file,
 
 # Finetuning training function
 def run_finetune_training(model, train_loader, val_loader, device, lr, n_epochs, log_file=None, 
-                          n_epochs_stop=5, artifact_root='./', subtitle="",
-                          gradient_clip_value=True, max_norm=1):
+                          n_epochs_stop=5, artifact_root='./', subtitle=""):
     # Define loss function and optimizer
     criterion = nn.CrossEntropyLoss()
     optimizer = optim.AdamW([
-        {"params": model.backbone.parameters(), "lr": 1e-5},
+        {"params": model.backbone.parameters(), "lr": 3e-4},
         {"params": model.classifier.parameters(), "lr": 1e-3},
     ])
 
     # Accumulate training stats
     train_stats = []
     best_val_acc = 0.0
-    last_val_acc = 0.0
+    last_val_loss = float('inf')
     n_epochs_no_improve = 0
     best_model = None
 
@@ -208,11 +207,18 @@ def run_finetune_training(model, train_loader, val_loader, device, lr, n_epochs,
             torch.save({'model_state': best_model.state_dict()}, model_path)
 
         # Early stopping check
-        if val_acc <= last_val_acc:
+        if val_loss >= last_val_loss:
             n_epochs_no_improve += 1
+            print_and_log(f"No improvement in val_loss for {n_epochs_no_improve} epochs.", log_file)
+            print_and_log(f"Last val_loss: {last_val_loss:.4f}, Current val_loss: {val_loss:.4f}", log_file)
             if n_epochs_no_improve >= n_epochs_stop:
                 print_and_log(f"No improvement for {n_epochs_no_improve} epochs. Early stopping at epoch {epoch}.", log_file)
                 break
+        else:
+            # Reset counter
+            n_epochs_no_improve = 0
+
+        last_val_loss = val_loss
 
     print_and_log("Finetuning complete.", log_file)
 
@@ -224,7 +230,7 @@ def run_finetune_training(model, train_loader, val_loader, device, lr, n_epochs,
 
 
 # Helper Functions for fine tuning
-def freeze_vit_layers(backbone, fraction=0.7):
+def freeze_vit_layers(backbone, fraction=0.6):
     transformer = backbone.transformer
 
     print("[freeze] Inspecting transformer:", type(transformer))
@@ -330,8 +336,8 @@ def main(args):
         state = ckpt
 
     # Load state from backbone
-    missing, unexpected = model.load_state_dict(state, strict=False)
-    print_and_log(f'Loaded pretrained encoder. missing keys: {missing}, unexpected: {unexpected}', log_file)
+    missing, unexpected = model.encoder_q.load_state_dict(state, strict=False)
+    print_and_log(f"Loaded encoder_q. missing={missing}, unexpected={unexpected}", log_file)
 
     # Build backbone
     print_and_log("Building ViT Hybrid backbone for finetuning...", log_file)
@@ -351,7 +357,7 @@ def main(args):
     # ----------------------------------------------------
     # Run finetuning
     print_and_log("Starting finetuning...", log_file)
-    model, train_stats = run_finetune_training(model, train_loader, val_loader, device, args.lr, args.n_epochs, log_file=log_file, artifact_root=args.artifact_root, subtitle=args.subtitle)
+    model, train_stats = run_finetune_training(model, train_loader, val_loader, device, args.lr, args.n_epochs, log_file=log_file, artifact_root=args.artifact_root, subtitle=args.subtitle, n_epochs_stop=10)
     print_and_log("Finetuning complete.", log_file)
 
     # Save training stats to pickle
@@ -374,7 +380,7 @@ def main(args):
 
     # Run testing
     print_and_log("Starting testing evaluation...", log_file)
-    run_testing(backbone=backbone,
+    run_testing(model=model,
                 test_loader=test_loader,
                 device=device,
                 criterion=nn.CrossEntropyLoss(),
