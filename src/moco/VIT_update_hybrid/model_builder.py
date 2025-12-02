@@ -4,12 +4,18 @@ import torch.nn.functional as F
 import copy
 from copy import deepcopy
 
-# ---------------------------
-# ConvStem -> Patch Embedding
-# ---------------------------
+# ----------------------------------------------------
+# Conv Stem -> Patch Embedding
+# ----------------------------------------------------
 class ConvPatchEmbed(nn.Module):
+    """
+    Small conv stem to produce patch-like embeddings.
+    Input: (B,1,H,W) for CXR
+    Output: (B, N_patches, embed_dim) and (H_grid, W_grid)
+    """
     def __init__(self, in_chans=3, embed_dim=384):
         super().__init__()
+         # Experiment: 2 conv layers with stride to reduce spatial dims
         self.proj = nn.Sequential(
             nn.Conv2d(in_chans, embed_dim // 2, kernel_size=3, stride=2, padding=1),
             nn.ReLU(),
@@ -17,16 +23,18 @@ class ConvPatchEmbed(nn.Module):
             nn.ReLU(),
         )
         self.embed_dim = embed_dim
+        # learned positional embeddings will be added in ViTHybrid
 
     def forward(self, x):
+        # x: (B,1,H,W)
         x = self.proj(x) # (B, C, H/4, W/4)
         B, C, H, W = x.shape
         x = x.flatten(2).transpose(1, 2) # (B, num_patches, embed_dim)
         return x
 
-# ---------------------------
-# Simple Transformer Encoder
-# ---------------------------
+# ----------------------------------------------------
+# Simple ViT Transformer Encoder
+# ----------------------------------------------------
 class TransformerEncoder(nn.Module):
     def __init__(self, embed_dim=384, num_layers=12, num_heads=6, mlp_ratio=4.0):
         super().__init__()
@@ -39,13 +47,18 @@ class TransformerEncoder(nn.Module):
         x = self.blocks(x) # (B, num_patches, embed_dim)
         return x
 
-# ---------------------------
+# ----------------------------------------------------
 # MoCo ViT Hybrid
-# ---------------------------
+# ----------------------------------------------------
 class ViTMoCo(nn.Module):
     """
-    MoCo encoder: query encoder & momentum-updated key encoder
-    Supports 1- or 3-channel input
+    Build a MoCo encoder: query encoder & momentum-updated key encoder
+    MoCo with Vision Transformer backbone (ViT) hybrid
+
+    Support 3-channel or 1-channel input (e.g., CXR)
+
+    Update: Use ConvPatchEmbed + SimpleViT instead of torchvision ViT
+    1. ConvPatchEmbed: small conv stem to produce patch-like embeddings
     """
     def __init__(self, proj_dim=128, K=65536, m=0.999, T=0.2,
                  embed_dim=384, in_chans=3, device='cuda'):
@@ -56,9 +69,10 @@ class ViTMoCo(nn.Module):
         self.device = device
         self.embed_dim = embed_dim
 
-        # -------------------
-        # Query Encoder
-        # -------------------
+        # -----------------------------------------------------------------------------
+        # 1. Query / Online Encoder (Vision Transformer backbone)
+        # -----------------------------------------------------------------------------
+        # Update to use the ConvPatchEmbed (instead of flattened) + SimpleViT
         self.encoder_q = nn.ModuleDict({
             'patch_embed': ConvPatchEmbed(in_chans=in_chans, embed_dim=embed_dim),
             'transformer': TransformerEncoder(embed_dim=embed_dim)
@@ -69,15 +83,16 @@ class ViTMoCo(nn.Module):
             nn.Linear(proj_dim, proj_dim)
         )
 
-        # -------------------
-        # Key Encoder (momentum copy)
-        # -------------------
+        # -----------------------------------------------------------------------------
+        # 2. Key Encoder (momentum-updated)
+        # -----------------------------------------------------------------------------
+        # MLP for projection
         self.encoder_k = copy.deepcopy(self.encoder_q)
         self.encoder_k_proj = copy.deepcopy(self.encoder_q_proj)
 
-        # -------------------
+        # -----------------------------------------------------------------------------
         # Queue for contrastive learning
-        # -------------------
+        # -----------------------------------------------------------------------------
         self.register_buffer("queue", F.normalize(torch.randn(proj_dim, K), dim=0))
         self.register_buffer("queue_ptr", torch.zeros(1, dtype=torch.long))
 
@@ -88,7 +103,11 @@ class ViTMoCo(nn.Module):
     # -------------------
     @torch.no_grad()
     def momentum_update_key_encoder(self):
-        """Momentum update: encoder_k = m*encoder_k + (1-m)*encoder_q"""
+        """
+        Momentum update for key encoder parameters
+        
+        m * k + (1-m) * q
+        """
         for param_q, param_k in zip(self.encoder_q.parameters(), self.encoder_k.parameters()):
             param_k.data = param_k.data * self.m + param_q.data * (1. - self.m)
         for param_q, param_k in zip(self.encoder_q_proj.parameters(), self.encoder_k_proj.parameters()):
@@ -99,8 +118,12 @@ class ViTMoCo(nn.Module):
     # -------------------
     @torch.no_grad()
     def _dequeue_and_enqueue(self, keys):
+        """
+        Update FIFO queue with new keys
+        """
         batch_size = keys.shape[0]
         ptr = int(self.queue_ptr)
+        # FIFO queue update
         if self.K % batch_size != 0:
             raise ValueError(f"Queue size ({self.K}) must be divisible by batch size ({batch_size})")
         self.queue[:, ptr:ptr + batch_size] = keys.T
@@ -121,7 +144,7 @@ class ViTMoCo(nn.Module):
         if im_k is None:
             return q  # for evaluation
 
-        # Key features
+        # Compute key features - key encoder (no grad)
         with torch.no_grad():
             self.momentum_update_key_encoder()
             k = self.encoder_k['patch_embed'](im_k)
@@ -131,13 +154,18 @@ class ViTMoCo(nn.Module):
             k = F.normalize(k, dim=1)
 
         # Contrastive logits
+        
+        # Positive logits: q*k - (B,1)
         l_pos = torch.einsum('nc,nc->n', [q, k]).unsqueeze(-1)  # Nx1
+        # Negative logits: q*queue - (B,K)
         l_neg = torch.einsum('nc,ck->nk', [q, self.queue.clone().detach()])  # NxK
         logits = torch.cat([l_pos, l_neg], dim=1)
         logits /= self.T
+        
+        # Labels: positive key indicators (first column)
         labels = torch.zeros(logits.shape[0], dtype=torch.long, device=self.device)
 
-        # Update queue
+        # enqueue and dequeue
         self._dequeue_and_enqueue(k)
 
         return logits, labels
