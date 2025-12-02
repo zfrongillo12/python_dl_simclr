@@ -60,16 +60,18 @@ def write_cm_to_file(cm, file_path, log_file=None, dataset_title='Pneumonia Clas
         print(f"Saved confusion matrix to {file_path}")
     return
 
-def run_testing(backbone, test_loader, device, dt, log_file, artifact_root='./', dataset_title='Pneumonia Classification'):
+def run_testing(backbone, linear_head, test_loader, device, dt, log_file, artifact_root='./', dataset_title='Pneumonia Classification'):
     # Run sklearn classification report
     backbone.eval()
+    linear_head.eval()
     all_preds = []
     all_labels = []
     with torch.no_grad():
         for images, labels in test_loader:
             images = images.to(device)
             labels = labels.to(device)
-            logits = backbone(images)
+            features = backbone(images)
+            logits = linear_head(features)
             preds = torch.argmax(logits, dim=1)
             all_preds.extend(preds.cpu().numpy())
             all_labels.extend(labels.cpu().numpy())
@@ -225,7 +227,7 @@ def test_moco_backbone(model, train_loader, test_loader, linear_n_epochs=20, dev
 
     # confusion matrix, report, etc.
     dt = __import__('datetime').datetime.now().strftime("%Y%m%d_%H%M%S")
-    run_testing(backbone, test_loader, device, dt, log_file, artifact_root=artifact_root)
+    run_testing(backbone, classifier_head, test_loader, device, dt, log_file, artifact_root=artifact_root)
     
     return test_stats
 
