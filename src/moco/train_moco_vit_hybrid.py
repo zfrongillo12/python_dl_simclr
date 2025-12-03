@@ -11,7 +11,11 @@ import json
 
 # ViT Hybrid
 from VIT_update_hybrid.model_builder import ViTMoCo as MoCo_ViT_Hybrid
-from dataset_loader import get_moco_medical_loader
+# from dataset_loader import get_moco_medical_loader
+
+from VIT_baseline.dataset_loader import get_moco_medical_loader as get_moco_medical_loader_vit
+
+from test_moco_vit_hybrid import run_moco_testing
 
 from utils import set_seed, save_state, print_and_log, save_stats
 
@@ -80,13 +84,15 @@ def run_moco_training_vit_hybrid(model,
         avg_running_loss = running_loss / len(train_loader)
         print_and_log(f'Epoch complete {epoch}, Avg. Running Loss: {avg_running_loss:.6f}', log_file=log_file)
 
-        # Save checkpoint every time the loss improves
-        if avg_running_loss < best_loss or epoch == 0:
+        # Save checkpoint every time the loss improves, or for the first epoch, or at regular intervals
+        if avg_running_loss < best_loss or epoch == 0 or (epoch + 1) % 5 == 0:
             if epoch != 0:
                 print_and_log(f'Loss improved from {best_loss:.6f} to {avg_running_loss:.6f}. Saving checkpoint.', log_file=log_file)
-            else:
+            elif epoch == 0:
                 print_and_log(f'Saving initial checkpoint at epoch {epoch+1}; Avg. Running Loss: {avg_running_loss:.6f}; Last Loss: {loss.item():.6f}', log_file=log_file)
-            
+            else:
+                print_and_log(f'Saving periodic checkpoint at epoch {epoch+1}; Avg. Running Loss: {avg_running_loss:.6f}; Last Loss: {loss.item():.6f}', log_file=log_file)
+
             # Update Loss
             best_loss = avg_running_loss
 
@@ -119,9 +125,9 @@ def main(args):
     # ---------------------------------------
     # Get training loader
     # ---------------------------------------
-    print_and_log(f"Creating MoCo medical image Train DataLoader... : from {args.train_csv_path}", log_file=log_file)
+    print_and_log(f"Creating MoCo medical image Train DataLoader (Hybrid ViT)... : from {args.train_csv_path}", log_file=log_file)
     # Unlabeled dataset for MoCo pretraining
-    train_loader = get_moco_medical_loader(
+    train_loader = get_moco_medical_loader_vit(
         data_split_type='train',
         csv_path=args.train_csv_path,
         root_dir=args.root_dir,
@@ -144,7 +150,7 @@ def main(args):
 
     base_lr = 1e-4 # Starting point
     # optimizer: update only the query encoder (q_patch, q_vit, q_proj)
-    #q_params = list(model.q_patch.parameters()) + list(model.q_vit.parameters()) + list(model.q_proj.parameters())
+    # q_params = list(model.q_patch.parameters()) + list(model.q_vit.parameters()) + list(model.q_proj.parameters())
     q_params = (
         list(model.encoder_q['patch_embed'].parameters()) +
         list(model.encoder_q['transformer'].parameters()) +
@@ -154,9 +160,17 @@ def main(args):
     # Original MoCo used SGD; but AdamW is more common for ViT
     #optimizer = optim.SGD(q_params, lr=0.03, momentum=0.9, weight_decay=1e-4)
     optimizer = torch.optim.Adam(q_params, lr=1e-4, weight_decay=1e-5)
+    effective_lr = base_lr * (args.batch_size ** 0.5 / 256 ** 0.5)
+
+    #optimizer = torch.optim.AdamW(
+    #    list(model.encoder_q.parameters()) + list(model.mlp_q.parameters()),
+    #    lr=effective_lr,
+    #    weight_decay=0.05,     # ViT default WD
+    #    betas=(0.9, 0.999)     # standard
+    #)
 
     # cosine LR scheduler
-    scheduler_cos = optim.lr_scheduler.CosineAnnealingLR(optimizer, T_max=200)  # T_max = epochs
+    scheduler_cos = optim.lr_scheduler.CosineAnnealingLR(optimizer, T_max=args.n_epochs)  # T_max = epochs
 
     # ---------------------------------------
     # Training Loop
@@ -203,6 +217,8 @@ def main(args):
     save_stats(train_stats, args.artifact_root + '/pretrain_stats_training.json', 'training', log_file=log_file)
 
     # Testing will be completed in a separate script
+    #if args.run_test:
+    #    run_moco_testing(model, train_loader, test_loader, linear_n_epochs=20, device='cuda', num_classes=2, log_file="./artifacts/testing_log.txt", artifact_root='./')
 
     return
 
@@ -219,6 +235,7 @@ if __name__ == "__main__":
     parser.add_argument('--root_dir', type=str, default='/path/to/dataset', help='Root directory for images')
     parser.add_argument('--artifact_root', type=str, default='./artifacts/', help='Directory for checkpoints')
     parser.add_argument('--model_type', type=str, default='ResNet50', help='Model type for MoCo (ResNet50 or VIT)')
+    parser.add_argument('--run_test', type=bool, default=False, help='Whether to run testing after training')
 
     # For testing
     parser.add_argument('--test_num_classes', type=int, default=2, help='Number of classes for testing classification')

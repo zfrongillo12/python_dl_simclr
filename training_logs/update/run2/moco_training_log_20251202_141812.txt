@@ -1,0 +1,42 @@
+[2025-12-02 14:18:12] Creating MoCo medical image Train DataLoader (Hybrid ViT)... : from /content/drive/MyDrive/Colab Notebooks/7_Py_DL/FP/Data/1_final_project_updated_names_train_moco.csv
+[2025-12-02 14:18:13] Using ViT Hybrid backbone for MoCo
+[2025-12-02 14:18:13] Note: No option to use pretrained weights; ignoring if set
+[2025-12-02 14:18:13] Starting MoCo ViT Hybrid training for 15 epochs...
+[2025-12-02 14:56:46] Epoch complete 0, Avg. Running Loss: 7.789614
+[2025-12-02 14:56:46] Saving initial checkpoint at epoch 1; Avg. Running Loss: 7.789614; Last Loss: 7.769632
+[2025-12-02 14:56:46] Saving checkpoint at epoch 1; /content/drive/MyDrive/Colab Notebooks/7_Py_DL/FP/artifacts//vit_hybrid_moco_checkpoint_epoch_1.pth
+[2025-12-02 15:35:22] Epoch complete 1, Avg. Running Loss: 7.764298
+[2025-12-02 15:35:22] Loss improved from 7.789614 to 7.764298. Saving checkpoint.
+[2025-12-02 15:35:22] Saving checkpoint at epoch 2; /content/drive/MyDrive/Colab Notebooks/7_Py_DL/FP/artifacts//vit_hybrid_moco_checkpoint_epoch_2.pth
+[2025-12-02 16:14:00] Epoch complete 2, Avg. Running Loss: 7.611811
+[2025-12-02 16:14:00] Loss improved from 7.764298 to 7.611811. Saving checkpoint.
+[2025-12-02 16:14:00] Saving checkpoint at epoch 3; /content/drive/MyDrive/Colab Notebooks/7_Py_DL/FP/artifacts//vit_hybrid_moco_checkpoint_epoch_3.pth
+[2025-12-02 16:52:39] Epoch complete 3, Avg. Running Loss: 7.575983
+[2025-12-02 16:52:39] Loss improved from 7.611811 to 7.575983. Saving checkpoint.
+[2025-12-02 16:52:39] Saving checkpoint at epoch 4; /content/drive/MyDrive/Colab Notebooks/7_Py_DL/FP/artifacts//vit_hybrid_moco_checkpoint_epoch_4.pth
+[2025-12-02 17:31:17] Epoch complete 4, Avg. Running Loss: 7.587703
+[2025-12-02 17:31:17] Loss improved from 7.575983 to 7.587703. Saving checkpoint.
+[2025-12-02 17:31:17] Saving checkpoint at epoch 5; /content/drive/MyDrive/Colab Notebooks/7_Py_DL/FP/artifacts//vit_hybrid_moco_checkpoint_epoch_5.pth
+[2025-12-02 18:09:54] Epoch complete 5, Avg. Running Loss: 7.596298
+[2025-12-02 18:48:29] Epoch complete 6, Avg. Running Loss: 7.575076
+[2025-12-02 18:48:29] Loss improved from 7.587703 to 7.575076. Saving checkpoint.
+[2025-12-02 18:48:29] Saving checkpoint at epoch 7; /content/drive/MyDrive/Colab Notebooks/7_Py_DL/FP/artifacts//vit_hybrid_moco_checkpoint_epoch_7.pth
+[2025-12-02 19:27:04] Epoch complete 7, Avg. Running Loss: 7.581620
+[2025-12-02 20:05:26] Epoch complete 8, Avg. Running Loss: 7.587188
+[2025-12-02 20:43:54] Epoch complete 9, Avg. Running Loss: 7.578191
+[2025-12-02 20:43:54] Loss improved from 7.575076 to 7.578191. Saving checkpoint.
+[2025-12-02 20:43:54] Saving checkpoint at epoch 10; /content/drive/MyDrive/Colab Notebooks/7_Py_DL/FP/artifacts//vit_hybrid_moco_checkpoint_epoch_10.pth
+[2025-12-02 21:22:11] Epoch complete 10, Avg. Running Loss: 7.563768
+[2025-12-02 21:22:11] Loss improved from 7.578191 to 7.563768. Saving checkpoint.
+[2025-12-02 21:22:11] Saving checkpoint at epoch 11; /content/drive/MyDrive/Colab Notebooks/7_Py_DL/FP/artifacts//vit_hybrid_moco_checkpoint_epoch_11.pth
+[2025-12-02 22:00:41] Epoch complete 11, Avg. Running Loss: 7.597151
+[2025-12-02 22:39:14] Epoch complete 12, Avg. Running Loss: 7.573326
+[2025-12-02 23:17:47] Epoch complete 13, Avg. Running Loss: 7.544974
+[2025-12-02 23:17:47] Loss improved from 7.563768 to 7.544974. Saving checkpoint.
+[2025-12-02 23:17:47] Saving checkpoint at epoch 14; /content/drive/MyDrive/Colab Notebooks/7_Py_DL/FP/artifacts//vit_hybrid_moco_checkpoint_epoch_14.pth
+[2025-12-02 23:56:19] Epoch complete 14, Avg. Running Loss: 7.581081
+[2025-12-02 23:56:19] Loss improved from 7.544974 to 7.581081. Saving checkpoint.
+[2025-12-02 23:56:19] Saving checkpoint at epoch 15; /content/drive/MyDrive/Colab Notebooks/7_Py_DL/FP/artifacts//vit_hybrid_moco_checkpoint_epoch_15.pth
+[2025-12-02 23:56:19] MoCo training complete!!
+[2025-12-02 23:56:19] Saved pretrained encoder to /content/drive/MyDrive/Colab Notebooks/7_Py_DL/FP/artifacts/vit_hybrid_moco_encoder_v2.pth
+[2025-12-02 23:56:19] Saved training stats to /content/drive/MyDrive/Colab Notebooks/7_Py_DL/FP/artifacts//pretrain_stats_training.json
