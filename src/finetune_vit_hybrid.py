@@ -235,31 +235,18 @@ def freeze_vit_layers(backbone, fraction=0.6):
 
     print("[freeze] Inspecting transformer:", type(transformer))
 
-    # Case 1: torchvision/timm ViT — transformer.blocks is a list of blocks
-    if hasattr(transformer, "blocks"):
-        maybe_blocks = transformer.blocks
-
-        # If blocks is actually a TransformerEncoder, check inside it
-        if isinstance(maybe_blocks, nn.TransformerEncoder):
-            print("[freeze] Found .blocks but it is a TransformerEncoder; using .blocks.layers")
-            blocks = maybe_blocks.layers  # ModuleList
-        else:
-            print("[freeze] Using .blocks directly")
-            blocks = maybe_blocks
-
-    # Case 2: PyTorch TransformerEncoder — uses .layers
-    elif hasattr(transformer, "layers"):
-        print("[freeze] Using .layers")
-        blocks = transformer.layers
-
+    # Your SimpleTransformer has: transformer.encoder.layers
+    if hasattr(transformer, "encoder") and hasattr(transformer.encoder, "layers"):
+        print("[freeze] Using transformer.encoder.layers")
+        blocks = transformer.encoder.layers
     else:
-        raise AttributeError("Transformer has neither .blocks nor .layers")
+        raise AttributeError(
+            "Expected transformer.encoder.layers in SimpleTransformer, but it's missing."
+        )
 
-    # Now blocks MUST be a list/ModuleList
     num_blocks = len(blocks)
     cutoff = int(num_blocks * fraction)
-
-    print(f"[freeze] Total blocks: {num_blocks}, freezing bottom: {cutoff}")
+    print(f"[freeze] Total blocks: {num_blocks}, freezing bottom {cutoff}")
 
     # Freeze patch embed
     for p in backbone.patch_embed.parameters():
@@ -272,6 +259,7 @@ def freeze_vit_layers(backbone, fraction=0.6):
                 p.requires_grad = False
 
     print("[freeze] Freeze complete.")
+
 
 # ======================= Main Function ==========================
 def main(args):
@@ -338,11 +326,12 @@ def main(args):
     # Build backbone
     print_and_log("Building ViT Hybrid backbone for finetuning...", log_file)
     # Embedding dim *must* match pretrained model
-    backbone = FT_ViTBackbone(model.encoder_q, embed_dim=192).to(device)
+    backbone = FT_ViTBackbone(model, embed_dim=192).to(device)
 
     # Freeze portion of backbone layers for finetuning
-    print_and_log("Freezing 70% of ViT layers in backbone for finetuning...", log_file)
-    freeze_vit_layers(backbone, fraction=0.7)
+    freeze_fraction = 0.5
+    print_and_log(f"Freezing {freeze_fraction * 100}% of ViT layers in backbone for finetuning...", log_file)
+    freeze_vit_layers(backbone, fraction=freeze_fraction)
 
     # Build final model
     print_and_log("Building finetune model...", log_file)

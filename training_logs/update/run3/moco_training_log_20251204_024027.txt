@@ -1,0 +1,46 @@
+[2025-12-04 02:40:27] Creating MoCo medical image Train DataLoader (Hybrid ViT)... : from /content/drive/MyDrive/Colab Notebooks/7_Py_DL/FP/Data/1_final_project_updated_names_train_moco.csv
+[2025-12-04 02:40:27] Using ViT Hybrid backbone for MoCo
+[2025-12-04 02:40:27] Note: No option to use pretrained weights; ignoring if set
+[2025-12-04 02:40:27] Starting MoCo ViT Hybrid training for 15 epochs...
+[2025-12-04 02:56:38] Epoch complete 0, Avg. Running Loss: 8.023569
+[2025-12-04 02:56:38] Saving initial checkpoint at epoch 1; Avg. Running Loss: 8.023569; Last Loss: 8.103824
+[2025-12-04 02:56:38] Saving checkpoint at epoch 1; /content/drive/MyDrive/Colab Notebooks/7_Py_DL/FP/artifacts//vit_hybrid_moco_checkpoint_epoch_1.pth
+[2025-12-04 03:12:48] Epoch complete 1, Avg. Running Loss: 8.056590
+[2025-12-04 03:28:58] Epoch complete 2, Avg. Running Loss: 7.919313
+[2025-12-04 03:28:58] Loss improved from 8.023569 to 7.919313. Saving checkpoint.
+[2025-12-04 03:28:58] Saving checkpoint at epoch 3; /content/drive/MyDrive/Colab Notebooks/7_Py_DL/FP/artifacts//vit_hybrid_moco_checkpoint_epoch_3.pth
+[2025-12-04 03:45:08] Epoch complete 3, Avg. Running Loss: 7.830574
+[2025-12-04 03:45:08] Loss improved from 7.919313 to 7.830574. Saving checkpoint.
+[2025-12-04 03:45:08] Saving checkpoint at epoch 4; /content/drive/MyDrive/Colab Notebooks/7_Py_DL/FP/artifacts//vit_hybrid_moco_checkpoint_epoch_4.pth
+[2025-12-04 04:01:18] Epoch complete 4, Avg. Running Loss: 7.854099
+[2025-12-04 04:01:18] Loss improved from 7.830574 to 7.854099. Saving checkpoint.
+[2025-12-04 04:01:18] Saving checkpoint at epoch 5; /content/drive/MyDrive/Colab Notebooks/7_Py_DL/FP/artifacts//vit_hybrid_moco_checkpoint_epoch_5.pth
+[2025-12-04 04:17:29] Epoch complete 5, Avg. Running Loss: 7.764595
+[2025-12-04 04:17:29] Loss improved from 7.854099 to 7.764595. Saving checkpoint.
+[2025-12-04 04:17:29] Saving checkpoint at epoch 6; /content/drive/MyDrive/Colab Notebooks/7_Py_DL/FP/artifacts//vit_hybrid_moco_checkpoint_epoch_6.pth
+[2025-12-04 04:33:39] Epoch complete 6, Avg. Running Loss: 7.781360
+[2025-12-04 04:49:50] Epoch complete 7, Avg. Running Loss: 7.750602
+[2025-12-04 04:49:50] Loss improved from 7.764595 to 7.750602. Saving checkpoint.
+[2025-12-04 04:49:50] Saving checkpoint at epoch 8; /content/drive/MyDrive/Colab Notebooks/7_Py_DL/FP/artifacts//vit_hybrid_moco_checkpoint_epoch_8.pth
+[2025-12-04 05:06:01] Epoch complete 8, Avg. Running Loss: 7.732896
+[2025-12-04 05:06:01] Loss improved from 7.750602 to 7.732896. Saving checkpoint.
+[2025-12-04 05:06:01] Saving checkpoint at epoch 9; /content/drive/MyDrive/Colab Notebooks/7_Py_DL/FP/artifacts//vit_hybrid_moco_checkpoint_epoch_9.pth
+[2025-12-04 05:22:11] Epoch complete 9, Avg. Running Loss: 7.718834
+[2025-12-04 05:22:11] Loss improved from 7.732896 to 7.718834. Saving checkpoint.
+[2025-12-04 05:22:11] Saving checkpoint at epoch 10; /content/drive/MyDrive/Colab Notebooks/7_Py_DL/FP/artifacts//vit_hybrid_moco_checkpoint_epoch_10.pth
+[2025-12-04 05:38:22] Epoch complete 10, Avg. Running Loss: 7.681418
+[2025-12-04 05:38:22] Loss improved from 7.718834 to 7.681418. Saving checkpoint.
+[2025-12-04 05:38:22] Saving checkpoint at epoch 11; /content/drive/MyDrive/Colab Notebooks/7_Py_DL/FP/artifacts//vit_hybrid_moco_checkpoint_epoch_11.pth
+[2025-12-04 05:54:32] Epoch complete 11, Avg. Running Loss: 7.700110
+[2025-12-04 06:10:42] Epoch complete 12, Avg. Running Loss: 7.665923
+[2025-12-04 06:10:42] Loss improved from 7.681418 to 7.665923. Saving checkpoint.
+[2025-12-04 06:10:42] Saving checkpoint at epoch 13; /content/drive/MyDrive/Colab Notebooks/7_Py_DL/FP/artifacts//vit_hybrid_moco_checkpoint_epoch_13.pth
+[2025-12-04 06:26:51] Epoch complete 13, Avg. Running Loss: 7.664934
+[2025-12-04 06:26:51] Loss improved from 7.665923 to 7.664934. Saving checkpoint.
+[2025-12-04 06:26:51] Saving checkpoint at epoch 14; /content/drive/MyDrive/Colab Notebooks/7_Py_DL/FP/artifacts//vit_hybrid_moco_checkpoint_epoch_14.pth
+[2025-12-04 06:42:59] Epoch complete 14, Avg. Running Loss: 7.665352
+[2025-12-04 06:42:59] Loss improved from 7.664934 to 7.665352. Saving checkpoint.
+[2025-12-04 06:42:59] Saving checkpoint at epoch 15; /content/drive/MyDrive/Colab Notebooks/7_Py_DL/FP/artifacts//vit_hybrid_moco_checkpoint_epoch_15.pth
+[2025-12-04 06:42:59] MoCo training complete!!
+[2025-12-04 06:42:59] Saved pretrained encoder to /content/drive/MyDrive/Colab Notebooks/7_Py_DL/FP/artifacts/vit_hybrid_moco_encoder_v3.pth
+[2025-12-04 06:42:59] Saved training stats to /content/drive/MyDrive/Colab Notebooks/7_Py_DL/FP/artifacts//pretrain_stats_training.json
