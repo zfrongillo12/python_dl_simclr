@@ -163,12 +163,12 @@ def run_linear_evaluation(backbone, linear_head, train_loader, test_loader, epoc
 # Test MoCo backbone
 # ================================================================================
 def test_moco_backbone(model, train_loader, test_loader, linear_n_epochs=20, device='cuda', num_classes=2, log_file=None, artifact_root='./'):
-    print("Extracting encoder_q from ViTMoCo model...")
+    print("Extracting the ViTMoCo model (new architecture)...")
 
     print_and_log("Model Keys: " + str(model.state_dict().keys()), log_file=log_file)
 
     # Load backbone using ViTBackbone wrapper
-    backbone = ViTBackbone(model.encoder_q).to(device)   # ModuleDict
+    backbone = ViTBackbone(model).to(device)   # ModuleDict
     num_features = model.embed_dim  # 384 or 192
 
     # Freeze backbone for linear eval
@@ -227,27 +227,24 @@ def main(args):
     # ----------------------------------------------------
     # Model Setup 
     # ----------------------------------------------------
-    # build model and load pretrained encoder
+    # build model and load pretrained encoder   
     model = MoCo_ViT_Hybrid(proj_dim=128, K=65536, m=0.99, T=0.2, embed_dim=192, device=device)
     model.to(device)
 
     # Load MoCo model from checkpoint
     model_checkpoint_path = os.path.join(args.artifact_root, args.model_checkpoint)
-    print_and_log(f"Loading pretrained MoCo model from {model_checkpoint_path}...", log_file=test_log_file)
+    print_and_log(f"Loading pretrained MoCo model from {model_checkpoint_path}...", test_log_file)
 
-    # Load in the saved MoCo model
     ckpt = torch.load(model_checkpoint_path, map_location=device)
 
-    # For MoCo: Only use the encoder for the backbone
-    if 'encoder_q_state' in ckpt:
-        print_and_log("Detected 'encoder_q_state' in checkpoint.", test_log_file)
-        state = ckpt['encoder_q_state']
-    elif 'model_state' in ckpt:
-        print_and_log("Detected 'model_state' in checkpoint. Extracting encoder_q weights.", test_log_file)
-        # If saved full model, try to extract encoder
-        state = {k.replace('encoder_q.', ''): v for k, v in ckpt['model_state'].items() if k.startswith('encoder_q')}
+    if "model_state" in ckpt:
+        print_and_log("Detected 'model_state' in checkpoint.", test_log_file)
+        state = ckpt["model_state"]
     else:
         state = ckpt
+
+    missing, unexpected = model.load_state_dict(state, strict=False)
+    print_and_log(f"Loaded model. Missing keys: {missing}, unexpected keys: {unexpected}", test_log_file)
     
     # Load state from backbone
     missing, unexpected = model.load_state_dict(state, strict=False)

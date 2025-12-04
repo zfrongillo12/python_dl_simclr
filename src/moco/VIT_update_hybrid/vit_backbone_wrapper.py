@@ -32,34 +32,45 @@ class LinearClassifier(nn.Module):
 # Testing - ViTBackbone Wrapper
 # ==============================
 class ViTBackbone(nn.Module):
-    def __init__(self, encoder_q):
+    def __init__(self, vit_moco_model):
         super().__init__()
-        self.patch_embed = encoder_q['patch_embed']
-        self.transformer = encoder_q['transformer']
+        self.patch_embed = vit_moco_model.patch_embed
+        self.pos_encoding = vit_moco_model.pos_encoding
+        self.transformer = vit_moco_model.transformer
+        self.embed_dim = vit_moco_model.embed_dim
 
+    @torch.no_grad()
     def forward(self, x):
-        x = self.patch_embed(x) # (B, N, D)
-        x = self.transformer(x) # (B, N, D)
+        # Patch embedding
+        tokens, _ = self.patch_embed(x)   # (B, N, C)
 
-        # Use CLS token = first token
-        cls = x[:, 0]
+        # Positional encoding + CLS
+        tokens = self.pos_encoding(tokens)  # (B, N+1, C)
 
+        # Pass through transformer
+        out = self.transformer(tokens)      # (B, N+1, C)
+
+        # return CLS token only
+        cls = out[:, 0]   # (B, C)
         return cls
 
 # ==============================
 # Fine Tuning - ViTBackbone Wrapper
 # ==============================
 class FT_ViTBackbone(nn.Module):
-    def __init__(self, encoder_q, embed_dim):
+    def __init__(self, model, embed_dim):
         super().__init__()
-        self.patch_embed = encoder_q.patch_embed
-        self.transformer = encoder_q.transformer
+        self.patch_embed = model.patch_embed
+        self.pos_encoding = model.pos_encoding
+        self.transformer = model.transformer
         self.embed_dim = embed_dim
 
     def forward(self, x):
-        x = self.patch_embed(x)        # (B, N, D)
-        x = self.transformer(x)        # (B, N, D)
-        return x[:, 0]                 # CLS token
+        tokens, _ = self.patch_embed(x)     # (B, N, D)
+        tokens = self.pos_encoding(tokens)  # add CLS + pos
+        out = self.transformer(tokens)      # (B, N+1, D)
+        return out[:, 0]                    # CLS
+
     
 # -------------------------------
 # Fine Tuning - Model

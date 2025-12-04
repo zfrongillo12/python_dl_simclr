@@ -150,24 +150,16 @@ def main(args):
 
     base_lr = 1e-4 # Starting point
     # optimizer: update only the query encoder (q_patch, q_vit, q_proj)
-    # q_params = list(model.q_patch.parameters()) + list(model.q_vit.parameters()) + list(model.q_proj.parameters())
     q_params = (
-        list(model.encoder_q['patch_embed'].parameters()) +
-        list(model.encoder_q['transformer'].parameters()) +
-        list(model.encoder_q_proj.parameters())
+        list(model.patch_embed.parameters()) +
+        list(model.pos_encoding.parameters()) +
+        list(model.transformer.parameters()) +
+        list(model.proj_head.parameters())
     )
 
     # Original MoCo used SGD; but AdamW is more common for ViT
-    #optimizer = optim.SGD(q_params, lr=0.03, momentum=0.9, weight_decay=1e-4)
     optimizer = torch.optim.Adam(q_params, lr=1e-4, weight_decay=1e-5)
     effective_lr = base_lr * (args.batch_size ** 0.5 / 256 ** 0.5)
-
-    #optimizer = torch.optim.AdamW(
-    #    list(model.encoder_q.parameters()) + list(model.mlp_q.parameters()),
-    #    lr=effective_lr,
-    #    weight_decay=0.05,     # ViT default WD
-    #    betas=(0.9, 0.999)     # standard
-    #)
 
     # cosine LR scheduler
     scheduler_cos = optim.lr_scheduler.CosineAnnealingLR(optimizer, T_max=args.n_epochs)  # T_max = epochs
@@ -207,8 +199,10 @@ def main(args):
 
     # Save encoder_q and mlp_q state dicts
     torch.save({
-        'encoder_q_state': model.encoder_q.state_dict(),
-        'encoder_q_proj': model.encoder_q_proj.state_dict(),
+        'patch_embed': model.patch_embed.state_dict(),
+        'pos_encoding': model.pos_encoding.state_dict(),
+        'transformer': model.transformer.state_dict(),
+        'proj_head': model.proj_head.state_dict(),
         'embedding_dim': model.embed_dim
     }, model_output_path)
     print_and_log(f"Saved pretrained encoder to {model_output_path}", log_file=log_file)

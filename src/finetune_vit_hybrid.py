@@ -325,19 +325,15 @@ def main(args):
     # -----------------------------------------------
 
     # For MoCo: Only use the encoder for the backbone
-    if 'encoder_q_state' in ckpt:
-        print_and_log("Detected 'encoder_q_state' in checkpoint.", log_file)
-        state = ckpt['encoder_q_state']
-    elif 'model_state' in ckpt:
-        print_and_log("Detected 'model_state' in checkpoint. Extracting encoder_q weights.", log_file)
-        # If saved full model, try to extract encoder
-        state = {k.replace('encoder_q.', ''): v for k, v in ckpt['model_state'].items() if k.startswith('encoder_q')}
+    if "model_state" in ckpt:
+        print_and_log("Detected 'model_state' in checkpoint.", log_file)
+        state = ckpt["model_state"]
     else:
         state = ckpt
 
     # Load state from backbone
-    missing, unexpected = model.encoder_q.load_state_dict(state, strict=False)
-    print_and_log(f"Loaded encoder_q. missing={missing}, unexpected={unexpected}", log_file)
+    missing, unexpected = model.load_state_dict(state, strict=False)
+    backbone = FT_ViTBackbone(model, embed_dim=model.embed_dim)
 
     # Build backbone
     print_and_log("Building ViT Hybrid backbone for finetuning...", log_file)
