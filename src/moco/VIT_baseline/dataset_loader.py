@@ -78,7 +78,6 @@ def get_moco_medical_loader(csv_path, root_dir, batch_size=64, num_workers=4,dat
     augmentation = transforms.Compose([
         transforms.RandomResizedCrop(224, scale=(0.7, 1.0)),
         transforms.RandomHorizontalFlip(),
-        transforms.RandomVerticalFlip(),
         transforms.RandomRotation(degrees=10),
 
         # Less aggressive for medical (and ViT-safe)
