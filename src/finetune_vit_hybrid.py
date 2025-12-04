@@ -235,7 +235,7 @@ def freeze_vit_layers(backbone, fraction=0.6):
 
     print("[freeze] Inspecting transformer:", type(transformer))
 
-    # Your SimpleTransformer has: transformer.encoder.layers
+    # SimpleTransformer has: transformer.encoder.layers
     if hasattr(transformer, "encoder") and hasattr(transformer.encoder, "layers"):
         print("[freeze] Using transformer.encoder.layers")
         blocks = transformer.encoder.layers
