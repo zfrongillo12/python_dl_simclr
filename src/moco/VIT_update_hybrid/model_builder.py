@@ -113,6 +113,11 @@ class ViTMoCo(nn.Module):
 
     Update: Use ConvPatchEmbed + SimpleViT instead of torchvision ViT
      * ConvPatchEmbed: small conv stem to produce patch-like embeddings
+
+    12/3/2023: Refine conv stem; from 3136 tokens to 784 tokens for 224x224 input
+
+    Note: Unlike the ResNet-50 MoCo implementation, the encoder is NOT a separate module here
+          since we build the momentum encoder directly within this class.
     """
     def __init__(self, proj_dim=128, K=65536, m=0.999, T=0.2,
                  embed_dim=384, in_chans=3, device='cuda', in_shape=224):
