@@ -7,3 +7,4 @@ training_logs/archive/*
 src/moco/run_linear_test_proto/archive
 
 src/moco/VIT_update_hybrid/archives
+Jupyter_notebooks/update/run3_updateViT_architecture_12_03/archive

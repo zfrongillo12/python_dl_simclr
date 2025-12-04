@@ -43,7 +43,7 @@ def write_cm_to_file(cm, file_path, log_file=None, dataset_title='Pneumonia Clas
     sns.heatmap(cm, annot=True, fmt='d', cmap='Blues')
     plt.xlabel('Predicted')
     plt.ylabel('True Label')
-    plt.title(f'Confusion Matrix: Finetune ResNet {dataset_title}')
+    plt.title(f'Confusion Matrix: Finetune ViT-Hybrid {dataset_title}')
     plt.savefig(file_path)
     plt.close()
     if log_file:
