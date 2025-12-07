@@ -1,6 +1,7 @@
 import random
 import numpy as np
 import torch
+import json
 
 def set_seed(seed=42):
     random.seed(seed)
@@ -27,4 +28,13 @@ def print_and_log(message, log_file=None):
     if log_file:
         with open(log_file, 'a') as f:
             f.write(f'[{printedatetime}] {message}\n')
+    return
+
+# ================================================================================
+# Function to save training/testing stats as JSON
+# ================================================================================
+def save_stats(stats, path, stat_type, log_file=None):
+    with open(path, 'w') as f:
+        json.dump(stats, f)
+    print_and_log(f"Saved {stat_type} stats to {path}", log_file=log_file)
     return

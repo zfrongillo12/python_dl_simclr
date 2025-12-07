@@ -1,0 +1,43 @@
+[2025-12-04 23:58:28] Loading pretrained MoCo model from /content/drive/MyDrive/Colab Notebooks/7_Py_DL/FP/artifacts//vit_moco_checkpoint_epoch_10.pth...
+[2025-12-04 23:59:00] Freezing 50.0% of ViT layers in backbone for finetuning...
+[2025-12-04 23:59:00] Building finetune model...
+[2025-12-04 23:59:00] Starting finetuning...
+[2025-12-04 23:59:00] Beginning finetuning training...
+[2025-12-04 23:59:54] Epoch 0: train_acc=0.5067, val_acc=0.5475
+[2025-12-04 23:59:54]            train_loss=0.8738, val_loss=0.6872
+[2025-12-04 23:59:54] New best model found at epoch 0 with val_acc=0.5475
+[2025-12-05 00:00:53] Epoch 1: train_acc=0.5285, val_acc=0.5566
+[2025-12-05 00:00:53]            train_loss=0.7048, val_loss=0.6883
+[2025-12-05 00:00:53] New best model found at epoch 1 with val_acc=0.5566
+[2025-12-05 00:00:54] No improvement in val_loss for 1 epochs.
+[2025-12-05 00:00:54] Last val_loss: 0.6872, Current val_loss: 0.6883
+[2025-12-05 00:01:46] Epoch 2: train_acc=0.5230, val_acc=0.5738
+[2025-12-05 00:01:46]            train_loss=0.7000, val_loss=0.6835
+[2025-12-05 00:01:46] New best model found at epoch 2 with val_acc=0.5738
+[2025-12-05 00:02:45] Epoch 3: train_acc=0.5253, val_acc=0.5493
+[2025-12-05 00:02:45]            train_loss=0.7002, val_loss=0.6845
+[2025-12-05 00:02:45] No improvement in val_loss for 1 epochs.
+[2025-12-05 00:02:45] Last val_loss: 0.6835, Current val_loss: 0.6845
+[2025-12-05 00:03:37] Epoch 4: train_acc=0.5544, val_acc=0.5538
+[2025-12-05 00:03:37]            train_loss=0.6878, val_loss=0.6863
+[2025-12-05 00:03:37] No improvement in val_loss for 2 epochs.
+[2025-12-05 00:03:37] Last val_loss: 0.6845, Current val_loss: 0.6863
+[2025-12-05 00:03:37] Finetuning complete.
+[2025-12-05 00:03:37] Saved /content/drive/MyDrive/Colab Notebooks/7_Py_DL/FP/artifacts/CheXpert_Pneumonia_binary_ViT_baseline_finetuned_model.pth
+[2025-12-05 00:03:37] Finetuning complete.
+[2025-12-05 00:03:39] Starting testing evaluation...
+[2025-12-05 00:03:45] Test Accuracy: 0.5511
+[2025-12-05 00:03:50] Classification Report:
+              precision    recall  f1-score   support
+
+           0       0.51      0.34      0.41      1000
+           1       0.57      0.72      0.64      1210
+
+    accuracy                           0.55      2210
+   macro avg       0.54      0.53      0.52      2210
+weighted avg       0.54      0.55      0.53      2210
+
+[2025-12-05 00:03:50] Confusion Matrix:
+[[342 658]
+ [334 876]]
+[2025-12-05 00:03:50] Saved confusion matrix to /content/drive/MyDrive/Colab Notebooks/7_Py_DL/FP/artifacts/confusion_matrix_20251204_235826.png

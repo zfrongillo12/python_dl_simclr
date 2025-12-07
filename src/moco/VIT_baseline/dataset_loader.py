@@ -78,7 +78,6 @@ def get_moco_medical_loader(csv_path, root_dir, batch_size=64, num_workers=4,dat
     augmentation = transforms.Compose([
         transforms.RandomResizedCrop(224, scale=(0.7, 1.0)),
         transforms.RandomHorizontalFlip(),
-        transforms.RandomVerticalFlip(),
         transforms.RandomRotation(degrees=10),
 
         # Less aggressive for medical (and ViT-safe)
@@ -105,6 +104,10 @@ def get_moco_medical_loader(csv_path, root_dir, batch_size=64, num_workers=4,dat
 
     # Print size of dataset
     print(f"Training Dataset size: {len(dataset)} images")
+
+    # Print size of one sample
+    sample_q, sample_k = dataset[0]
+    print(f"Data Sample q shape: {sample_q.shape}, Sample k shape: {sample_k.shape}")
 
     # Create DataLoader
     drop_last = (len(dataset) % batch_size != 0)

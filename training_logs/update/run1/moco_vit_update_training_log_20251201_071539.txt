@@ -1,0 +1,48 @@
+[2025-12-01 07:15:39] Creating MoCo medical image Train DataLoader... : from /content/drive/MyDrive/Colab Notebooks/7_Py_DL/FP/Data/1_final_project_updated_names_train_moco.csv
+[2025-12-01 07:15:39] Using ViT Hybrid backbone for MoCo
+[2025-12-01 07:15:39] Note: No option to use pretrained weights; ignoring if set
+[2025-12-01 07:15:39] Starting MoCo ViT Hybrid training for 25 epochs...
+[2025-12-01 07:54:00] Epoch complete 0, Avg. Running Loss: 7.797267
+[2025-12-01 07:54:00] Saving initial checkpoint at epoch 1; Avg. Running Loss: 7.797267; Last Loss: 7.696745
+[2025-12-01 07:54:00] Saving checkpoint at epoch 1; /content/drive/MyDrive/Colab Notebooks/7_Py_DL/FP/artifacts//vit_hybrid_moco_checkpoint_epoch_1.pth
+[2025-12-01 08:32:27] Epoch complete 1, Avg. Running Loss: 7.736764
+[2025-12-01 08:32:27] Loss improved from 7.797267 to 7.736764. Saving checkpoint.
+[2025-12-01 08:32:27] Saving checkpoint at epoch 2; /content/drive/MyDrive/Colab Notebooks/7_Py_DL/FP/artifacts//vit_hybrid_moco_checkpoint_epoch_2.pth
+[2025-12-01 09:10:58] Epoch complete 2, Avg. Running Loss: 7.628784
+[2025-12-01 09:10:58] Loss improved from 7.736764 to 7.628784. Saving checkpoint.
+[2025-12-01 09:10:58] Saving checkpoint at epoch 3; /content/drive/MyDrive/Colab Notebooks/7_Py_DL/FP/artifacts//vit_hybrid_moco_checkpoint_epoch_3.pth
+[2025-12-01 09:49:30] Epoch complete 3, Avg. Running Loss: 7.582258
+[2025-12-01 09:49:30] Loss improved from 7.628784 to 7.582258. Saving checkpoint.
+[2025-12-01 09:49:30] Saving checkpoint at epoch 4; /content/drive/MyDrive/Colab Notebooks/7_Py_DL/FP/artifacts//vit_hybrid_moco_checkpoint_epoch_4.pth
+[2025-12-01 10:28:03] Epoch complete 4, Avg. Running Loss: 7.573294
+[2025-12-01 10:28:03] Loss improved from 7.582258 to 7.573294. Saving checkpoint.
+[2025-12-01 10:28:03] Saving checkpoint at epoch 5; /content/drive/MyDrive/Colab Notebooks/7_Py_DL/FP/artifacts//vit_hybrid_moco_checkpoint_epoch_5.pth
+[2025-12-01 11:06:35] Epoch complete 5, Avg. Running Loss: 7.572443
+[2025-12-01 11:06:35] Loss improved from 7.573294 to 7.572443. Saving checkpoint.
+[2025-12-01 11:06:35] Saving checkpoint at epoch 6; /content/drive/MyDrive/Colab Notebooks/7_Py_DL/FP/artifacts//vit_hybrid_moco_checkpoint_epoch_6.pth
+[2025-12-01 11:45:06] Epoch complete 6, Avg. Running Loss: 7.584793
+[2025-12-01 12:23:38] Epoch complete 7, Avg. Running Loss: 7.569432
+[2025-12-01 12:23:38] Loss improved from 7.572443 to 7.569432. Saving checkpoint.
+[2025-12-01 12:23:38] Saving checkpoint at epoch 8; /content/drive/MyDrive/Colab Notebooks/7_Py_DL/FP/artifacts//vit_hybrid_moco_checkpoint_epoch_8.pth
+[2025-12-01 13:02:06] Epoch complete 8, Avg. Running Loss: 7.553270
+[2025-12-01 13:02:06] Loss improved from 7.569432 to 7.553270. Saving checkpoint.
+[2025-12-01 13:02:06] Saving checkpoint at epoch 9; /content/drive/MyDrive/Colab Notebooks/7_Py_DL/FP/artifacts//vit_hybrid_moco_checkpoint_epoch_9.pth
+[2025-12-01 13:40:34] Epoch complete 9, Avg. Running Loss: 7.557308
+[2025-12-01 14:18:56] Epoch complete 10, Avg. Running Loss: 7.563169
+[2025-12-01 14:57:20] Epoch complete 11, Avg. Running Loss: 7.543172
+[2025-12-01 14:57:20] Loss improved from 7.553270 to 7.543172. Saving checkpoint.
+[2025-12-01 14:57:20] Saving checkpoint at epoch 12; /content/drive/MyDrive/Colab Notebooks/7_Py_DL/FP/artifacts//vit_hybrid_moco_checkpoint_epoch_12.pth
+[2025-12-01 15:35:41] Epoch complete 12, Avg. Running Loss: 7.596420
+[2025-12-01 16:14:01] Epoch complete 13, Avg. Running Loss: 7.577547
+[2025-12-01 16:52:21] Epoch complete 14, Avg. Running Loss: 7.564207
+[2025-12-01 17:30:40] Epoch complete 15, Avg. Running Loss: 7.566714
+[2025-12-01 18:09:01] Epoch complete 16, Avg. Running Loss: 7.555311
+[2025-12-01 18:47:17] Epoch complete 17, Avg. Running Loss: 7.591868
+[2025-12-01 19:25:33] Epoch complete 18, Avg. Running Loss: 7.588518
+[2025-12-01 20:03:43] Epoch complete 19, Avg. Running Loss: 7.580855
+[2025-12-01 20:41:54] Epoch complete 20, Avg. Running Loss: 7.578710
+[2025-12-01 21:20:04] Epoch complete 21, Avg. Running Loss: 7.552882
+[2025-12-01 21:58:12] Epoch complete 22, Avg. Running Loss: 7.566345
+[2025-12-01 22:36:15] Epoch complete 23, Avg. Running Loss: 7.565767
+[2025-12-01 23:14:02] Epoch complete 24, Avg. Running Loss: 7.560137
+[2025-12-01 23:14:02] MoCo training complete!!
