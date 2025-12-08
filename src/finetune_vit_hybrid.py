@@ -298,7 +298,7 @@ def main(args):
     # Model Setup 
     # ----------------------------------------------------
     # build model and load pretrained encoder
-    model = MoCo_ViT_Hybrid(proj_dim=128, K=65536, m=0.99, T=0.2, embed_dim=192, device=device)
+    model = MoCo_ViT_Hybrid(proj_dim=128, K=65536, m=0.99, T=0.2, embed_dim=args.embed_dim, device=device)
     model.to(device)
 
     # Load MoCo model from checkpoint
@@ -326,7 +326,7 @@ def main(args):
     # Build backbone
     print_and_log("Building ViT Hybrid backbone for finetuning...", log_file)
     # Embedding dim *must* match pretrained model
-    backbone = FT_ViTBackbone(model, embed_dim=192).to(device)
+    backbone = FT_ViTBackbone(model, embed_dim=args.embed_dim).to(device)
 
     # Freeze portion of backbone layers for finetuning
     freeze_fraction = 0.5
@@ -388,7 +388,8 @@ if __name__ == "__main__":
     parser.add_argument('--root_dir', type=str, default='/path/to/dataset', help='Root directory of images')
     parser.add_argument('--pretrained_encoder', type=str, default='vit_hybrid_moco_encoder.pth', help='Path to pretrained encoder weights')
     parser.add_argument('--artifact_root', type=str, default='./finetune_artifacts', help='Directory to save artifacts')
-    
+    parser.add_argument('--embed_dim', type=int, default=192, help='Embedding dimension of ViT Hybrid model')
+
     # Dataset
     parser.add_argument('--label_col', type=str, default='Pneumonia', help='Name of the label column in the dataset')
     parser.add_argument('--num_classes', type=int, default=2, help='Number of output classes')
