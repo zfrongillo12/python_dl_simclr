@@ -2,28 +2,6 @@
 
 ### Authors: Zoe Frongillo, Scott Hansen
 
-## Getting Started / Google Collab File Setup
-
-* Ran our pre-training and transfer learning using Google Collab (L4 and A100 High RAM GPUs)
-
-To execute our experiments, we used Jupyter notebooks that can be found in `./Jupyter_notebooks`
-
-**Collab File Structure Setup:**
-
-You will need to modify the first few lines of the notebooks to direct to the local file dependencies defined below.
-
-1. Specify your ROOT where you're storing files (note: `/content/drive/MyDrive/` is the same base mount directory on all Google Collaboratory notebooks):
-   * e.g.) `FP_ROOT="/content/drive/MyDrive/Colab Notebooks/7_Py_DL/FP/"`
-2. Create `./Data` at `$FP_ROOT`. 
-   * Copy the zipped image dataset (e.g. zipped and organized into train/val/test subdirectories) and the CSV labels located in `./Dataset_Processing/CheXpert/dataset_splits`
-   * `$FP_ROOT/Data/`: flattened structure, copy the zipped data files and the csv labels from `./Dataset_processing` (or your own custom)
-3. Create `./src` at `$FP_ROOT`. Copy/paste the files and directory structure from Github: 
-   * `$FP_ROOT/src/`: copy/paste the directory structure from Github:  `./src/` 
-4. Create `./artifacts` at `$FP_ROOT`.
-   * `$FP_ROOT/artifacts/`: outputs will be written here 
-
-When executing on Collab, will need to agree to allow the application to review your files.
-
 ## Objective / Hypothesis
 This project will investigate how contrastive self-supervised pre-training (through the MoCo framework)can effectively learn feature representations for medical images, in the form of Chest X-rays.  We will use transfer learning on different architectures to evaluate medical X-Ray classification.
 
@@ -50,3 +28,27 @@ After obtaining the patch-level features, we have appended a small network (like
 **Why we think this is important:**
 * The top-K patch selection strategy could help focus the contrastive learning on the most informative anatomical regions (suppressing noise and improving cross-domain generalizability, which is a significant concern in the domain of medical imaging).
 * The heat-map visualization of the selected important patches can provide a highly useful explainability component, which is especially important in medical-imaging contexts where clinicians need insight into why and how the model made its decision.
+
+## Getting Started - Jupyter Notebooks
+
+* Ran our pre-training and transfer learning using Google Collab (L4 and A100 High RAM GPUs)
+
+To execute our experiments, we used Jupyter notebooks that can be found in `./Jupyter_notebooks`
+
+These notebooks call wrapper functions (e.g. through the argument CLI) for the primary code defined in `src/`
+
+**Collab File Structure Setup:**
+
+You will need to modify the first few lines of the notebooks to direct to the local file dependencies defined below.
+
+1. Specify your ROOT where you're storing files (note: `/content/drive/MyDrive/` is the same base mount directory on all Google Collaboratory notebooks):
+   * e.g.) `FP_ROOT="/content/drive/MyDrive/Colab Notebooks/7_Py_DL/FP/"`
+2. Create `./Data` at `$FP_ROOT`. 
+   * Copy the zipped image dataset (e.g. zipped and organized into train/val/test subdirectories) and the CSV labels located in `./Dataset_Processing/CheXpert/dataset_splits`
+   * `$FP_ROOT/Data/`: flattened structure; should contain zipped image data and the CSV labels 
+3. Create `./src` at `$FP_ROOT`. Copy/paste the files and directory structure from Github: 
+   * `$FP_ROOT/src/`: copy/paste the directory structure from Github:  `./src/` 
+4. Create `./artifacts` at `$FP_ROOT`.
+   * `$FP_ROOT/artifacts/`: outputs will be written here 
+
+When executing on Collab, will need to agree to allow the application to review your files.
