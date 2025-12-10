@@ -1,7 +1,11 @@
 # Fine Tune
-Subdirectory contains code required for fine tuning the pre-trained backbone on a smaller dataset.
+Subdirectory contains partial code for fine tuning the pre-trained backbone on a smaller dataset.
 
 Main execution function: `src\finetune_resnet.py`
+
+Related functions:
+* `src\finetune_vit_baseline.py`
+* `src\finetune_vit_hybrid.py`
 
 ## DataLoader Expectations
 * Expects the folder to be formatted as such:

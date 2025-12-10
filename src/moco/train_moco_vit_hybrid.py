@@ -148,6 +148,18 @@ def main(args):
     model = MoCo_ViT_Hybrid(proj_dim=args.dim, K=args.K, m=args.m, T=args.T, embed_dim=args.embedding_dim, device=device)
     model.to(device)
 
+    # Log total parameters for model for comparison
+    # ---------------------------------------
+    total_params = sum(p.numel() for p in model.parameters())
+    print_and_log(f"Total model parameters: {total_params:,}", log_file=log_file)
+    
+    trainable_params = sum(p.numel() for p in model.parameters() if p.requires_grad)
+    print_and_log(f"Trainable model parameters: {trainable_params:,}", log_file=log_file)
+
+    model_size_mb = total_params * 4 / (1024**2)
+    print_and_log(f"Model size: {model_size_mb:.2f} MB", log_file=log_file)
+    # ---------------------------------------
+
     base_lr = 1e-4 # Starting point
     # optimizer: update only the query encoder (q_patch, q_vit, q_proj)
     q_params = (

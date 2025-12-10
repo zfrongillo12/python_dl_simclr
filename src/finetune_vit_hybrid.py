@@ -163,7 +163,7 @@ def run_testing(model, test_loader, device, criterion, dt, log_file,
 
 # Finetuning training function
 def run_finetune_training(model, train_loader, val_loader, device, lr, n_epochs, log_file=None, 
-                          n_epochs_stop=5, artifact_root='./', subtitle=""):
+                          n_epochs_stop=5, artifact_root='./', subtitle="", flag_save_latest=False):
     # Define loss function and optimizer
     criterion = nn.CrossEntropyLoss()
     optimizer = optim.AdamW([
@@ -223,10 +223,16 @@ def run_finetune_training(model, train_loader, val_loader, device, lr, n_epochs,
     print_and_log("Finetuning complete.", log_file)
 
     # Save finetuned model
+    if best_model is not None and flag_save_latest:
+        best_model = model
+        print_and_log("Using latest model from training for final save.", log_file)
+    else:
+        print_and_log("Using best model from training for final save.", log_file)
+
     model_path = os.path.join(artifact_root, f'{subtitle}_finetuned_model.pth')
     torch.save({'model_state': best_model.state_dict()}, model_path)
     print_and_log(f'Saved {model_path}', log_file)
-    return best_model, train_stats
+    return model, train_stats
 
 
 # Helper Functions for fine tuning
@@ -298,7 +304,7 @@ def main(args):
     # Model Setup 
     # ----------------------------------------------------
     # build model and load pretrained encoder
-    model = MoCo_ViT_Hybrid(proj_dim=128, K=65536, m=0.99, T=0.2, embed_dim=192, device=device)
+    model = MoCo_ViT_Hybrid(proj_dim=128, K=65536, m=0.99, T=0.2, embed_dim=args.embed_dim, device=device)
     model.to(device)
 
     # Load MoCo model from checkpoint
@@ -326,12 +332,11 @@ def main(args):
     # Build backbone
     print_and_log("Building ViT Hybrid backbone for finetuning...", log_file)
     # Embedding dim *must* match pretrained model
-    backbone = FT_ViTBackbone(model, embed_dim=192).to(device)
+    backbone = FT_ViTBackbone(model, embed_dim=args.embed_dim).to(device)
 
     # Freeze portion of backbone layers for finetuning
-    freeze_fraction = 0.5
-    print_and_log(f"Freezing {freeze_fraction * 100}% of ViT layers in backbone for finetuning...", log_file)
-    freeze_vit_layers(backbone, fraction=freeze_fraction)
+    print_and_log(f"Freezing {args.freeze_fraction * 100}% of ViT layers in backbone for finetuning...", log_file)
+    freeze_vit_layers(backbone, fraction=args.freeze_fraction)
 
     # Build final model
     print_and_log("Building finetune model...", log_file)
@@ -342,7 +347,8 @@ def main(args):
     # ----------------------------------------------------
     # Run finetuning
     print_and_log("Starting finetuning...", log_file)
-    model, train_stats = run_finetune_training(model, train_loader, val_loader, device, args.lr, args.n_epochs, log_file=log_file, artifact_root=args.artifact_root, subtitle=args.subtitle, n_epochs_stop=10)
+    model, train_stats = run_finetune_training(model, train_loader, val_loader, device, args.lr, args.n_epochs, log_file=log_file,
+                                            artifact_root=args.artifact_root, subtitle=args.subtitle, n_epochs_stop=10, flag_save_latest=args.flag_save_latest)
     print_and_log("Finetuning complete.", log_file)
 
     # Save training stats to pickle
@@ -388,7 +394,9 @@ if __name__ == "__main__":
     parser.add_argument('--root_dir', type=str, default='/path/to/dataset', help='Root directory of images')
     parser.add_argument('--pretrained_encoder', type=str, default='vit_hybrid_moco_encoder.pth', help='Path to pretrained encoder weights')
     parser.add_argument('--artifact_root', type=str, default='./finetune_artifacts', help='Directory to save artifacts')
-    
+    parser.add_argument('--embed_dim', type=int, default=192, help='Embedding dimension of ViT Hybrid model')
+    parser.add_argument('--freeze_fraction', type=float, default=0.5, help='Fraction of ViT layers to freeze during finetuning')
+
     # Dataset
     parser.add_argument('--label_col', type=str, default='Pneumonia', help='Name of the label column in the dataset')
     parser.add_argument('--num_classes', type=int, default=2, help='Number of output classes')
@@ -396,6 +404,7 @@ if __name__ == "__main__":
     parser.add_argument('--subtitle', type=str, default='vit_hybrid', help='Subtitle for saved models and logs')
 
     # Optional
+    parser.add_argument('--flag_save_latest', action='store_true', help='Flag to save latest model during finetuning')
     parser.add_argument('--batch_size', type=int, default=32, help='Batch size')
     parser.add_argument('--num_workers', type=int, default=4, help='Number of data loader workers')
     parser.add_argument('--device', type=str, default='cuda' if torch.cuda.is_available() else 'cpu', help='Device to use')
