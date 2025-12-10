@@ -1,0 +1,333 @@
+[2025-12-09 12:38:55] Creating MoCo medical image Train DataLoader... : from /content/drive/MyDrive/ViT_MoCo_Project/Data/1_final_project_updated_names_train_moco.csv
+[2025-12-09 12:38:57] Using backbone: VIT_S16
+[2025-12-09 12:38:58] Starting Unified MoCo training for 100 epochs...
+[2025-12-09 12:38:58] Precision mode = fp16
+[2025-12-09 12:42:35] Epoch complete 0, Avg. Running Loss: 6.435738
+[2025-12-09 12:42:35] POS_COS=0.9503
+[2025-12-09 12:42:35] Saving initial checkpoint at epoch 1; Avg. Running Loss: 6.435738
+[2025-12-09 12:42:50] Saving checkpoint at epoch 1; /content/drive/MyDrive/ViT_MoCo_Project/artifacts/vit_baseline//checkpoint_epoch_1.pth
+[2025-12-09 12:46:36] Epoch complete 1, Avg. Running Loss: 6.191602
+[2025-12-09 12:46:36] POS_COS=0.9992
+[2025-12-09 12:46:36] Loss improved from 6.435738 to 6.191602. Saving checkpoint.
+[2025-12-09 12:46:37] Saving checkpoint at epoch 2; /content/drive/MyDrive/ViT_MoCo_Project/artifacts/vit_baseline//checkpoint_epoch_2.pth
+[2025-12-09 12:50:23] Epoch complete 2, Avg. Running Loss: 6.189332
+[2025-12-09 12:50:23] POS_COS=0.9994
+[2025-12-09 12:50:23] Loss improved from 6.191602 to 6.189332. Saving checkpoint.
+[2025-12-09 12:50:23] Saving checkpoint at epoch 3; /content/drive/MyDrive/ViT_MoCo_Project/artifacts/vit_baseline//checkpoint_epoch_3.pth
+[2025-12-09 12:54:07] Epoch complete 3, Avg. Running Loss: 6.186123
+[2025-12-09 12:54:07] POS_COS=0.9995
+[2025-12-09 12:54:07] Loss improved from 6.189332 to 6.186123. Saving checkpoint.
+[2025-12-09 12:54:08] Saving checkpoint at epoch 4; /content/drive/MyDrive/ViT_MoCo_Project/artifacts/vit_baseline//checkpoint_epoch_4.pth
+[2025-12-09 12:57:46] Epoch complete 4, Avg. Running Loss: 6.186046
+[2025-12-09 12:57:46] POS_COS=0.9995
+[2025-12-09 12:57:46] Loss improved from 6.186123 to 6.186046. Saving checkpoint.
+[2025-12-09 12:57:46] Saving checkpoint at epoch 5; /content/drive/MyDrive/ViT_MoCo_Project/artifacts/vit_baseline//checkpoint_epoch_5.pth
+[2025-12-09 13:01:27] Epoch complete 5, Avg. Running Loss: 6.186492
+[2025-12-09 13:01:27] POS_COS=0.9994
+[2025-12-09 13:05:07] Epoch complete 6, Avg. Running Loss: 6.188360
+[2025-12-09 13:05:07] POS_COS=0.9991
+[2025-12-09 13:08:49] Epoch complete 7, Avg. Running Loss: 6.191447
+[2025-12-09 13:08:49] POS_COS=0.9981
+[2025-12-09 13:12:35] Epoch complete 8, Avg. Running Loss: 6.180980
+[2025-12-09 13:12:35] POS_COS=0.9998
+[2025-12-09 13:12:35] Loss improved from 6.186046 to 6.180980. Saving checkpoint.
+[2025-12-09 13:12:35] Saving checkpoint at epoch 9; /content/drive/MyDrive/ViT_MoCo_Project/artifacts/vit_baseline//checkpoint_epoch_9.pth
+[2025-12-09 13:16:21] Epoch complete 9, Avg. Running Loss: 6.180055
+[2025-12-09 13:16:21] POS_COS=0.9999
+[2025-12-09 13:16:21] Loss improved from 6.180980 to 6.180055. Saving checkpoint.
+[2025-12-09 13:16:22] Saving checkpoint at epoch 10; /content/drive/MyDrive/ViT_MoCo_Project/artifacts/vit_baseline//checkpoint_epoch_10.pth
+[2025-12-09 13:20:02] Epoch complete 10, Avg. Running Loss: 6.179734
+[2025-12-09 13:20:02] POS_COS=1.0000
+[2025-12-09 13:20:02] Loss improved from 6.180055 to 6.179734. Saving checkpoint.
+[2025-12-09 13:20:03] Saving checkpoint at epoch 11; /content/drive/MyDrive/ViT_MoCo_Project/artifacts/vit_baseline//checkpoint_epoch_11.pth
+[2025-12-09 13:23:44] Epoch complete 11, Avg. Running Loss: 6.180119
+[2025-12-09 13:23:44] POS_COS=0.9999
+[2025-12-09 13:27:30] Epoch complete 12, Avg. Running Loss: 6.181391
+[2025-12-09 13:27:30] POS_COS=0.9997
+[2025-12-09 13:31:12] Epoch complete 13, Avg. Running Loss: 6.185387
+[2025-12-09 13:31:12] POS_COS=0.9987
+[2025-12-09 13:34:48] Epoch complete 14, Avg. Running Loss: 6.193348
+[2025-12-09 13:34:48] POS_COS=0.9968
+[2025-12-09 13:34:48] Loss improved from 6.179734 to 6.193348. Saving checkpoint.
+[2025-12-09 13:34:49] Saving checkpoint at epoch 15; /content/drive/MyDrive/ViT_MoCo_Project/artifacts/vit_baseline//checkpoint_epoch_15.pth
+[2025-12-09 13:38:30] Epoch complete 15, Avg. Running Loss: 6.206834
+[2025-12-09 13:38:30] POS_COS=0.9940
+[2025-12-09 13:42:15] Epoch complete 16, Avg. Running Loss: 6.223626
+[2025-12-09 13:42:15] POS_COS=0.9906
+[2025-12-09 13:46:02] Epoch complete 17, Avg. Running Loss: 6.239226
+[2025-12-09 13:46:02] POS_COS=0.9875
+[2025-12-09 13:49:38] Epoch complete 18, Avg. Running Loss: 6.251410
+[2025-12-09 13:49:38] POS_COS=0.9851
+[2025-12-09 13:53:24] Epoch complete 19, Avg. Running Loss: 6.261820
+[2025-12-09 13:53:24] POS_COS=0.9830
+[2025-12-09 13:53:24] Loss improved from 6.193348 to 6.261820. Saving checkpoint.
+[2025-12-09 13:53:25] Saving checkpoint at epoch 20; /content/drive/MyDrive/ViT_MoCo_Project/artifacts/vit_baseline//checkpoint_epoch_20.pth
+[2025-12-09 13:57:10] Epoch complete 20, Avg. Running Loss: 6.293951
+[2025-12-09 13:57:10] POS_COS=0.9766
+[2025-12-09 14:00:46] Epoch complete 21, Avg. Running Loss: 6.295904
+[2025-12-09 14:00:46] POS_COS=0.9761
+[2025-12-09 14:04:29] Epoch complete 22, Avg. Running Loss: 6.327179
+[2025-12-09 14:04:29] POS_COS=0.9699
+[2025-12-09 14:08:09] Epoch complete 23, Avg. Running Loss: 6.321233
+[2025-12-09 14:08:09] POS_COS=0.9711
+[2025-12-09 14:11:54] Epoch complete 24, Avg. Running Loss: 6.306397
+[2025-12-09 14:11:54] POS_COS=0.9740
+[2025-12-09 14:11:54] Loss improved from 6.261820 to 6.306397. Saving checkpoint.
+[2025-12-09 14:11:55] Saving checkpoint at epoch 25; /content/drive/MyDrive/ViT_MoCo_Project/artifacts/vit_baseline//checkpoint_epoch_25.pth
+[2025-12-09 14:15:43] Epoch complete 25, Avg. Running Loss: 6.328855
+[2025-12-09 14:15:43] POS_COS=0.9696
+[2025-12-09 14:19:24] Epoch complete 26, Avg. Running Loss: 6.331700
+[2025-12-09 14:19:24] POS_COS=0.9690
+[2025-12-09 14:23:00] Epoch complete 27, Avg. Running Loss: 6.327246
+[2025-12-09 14:23:00] POS_COS=0.9698
+[2025-12-09 14:26:39] Epoch complete 28, Avg. Running Loss: 6.344281
+[2025-12-09 14:26:39] POS_COS=0.9664
+[2025-12-09 14:30:17] Epoch complete 29, Avg. Running Loss: 6.330361
+[2025-12-09 14:30:17] POS_COS=0.9691
+[2025-12-09 14:30:17] Loss improved from 6.306397 to 6.330361. Saving checkpoint.
+[2025-12-09 14:30:18] Saving checkpoint at epoch 30; /content/drive/MyDrive/ViT_MoCo_Project/artifacts/vit_baseline//checkpoint_epoch_30.pth
+[2025-12-09 14:34:01] Epoch complete 30, Avg. Running Loss: 6.278921
+[2025-12-09 14:34:01] POS_COS=0.9793
+[2025-12-09 14:34:01] Loss improved from 6.330361 to 6.278921. Saving checkpoint.
+[2025-12-09 14:34:02] Saving checkpoint at epoch 31; /content/drive/MyDrive/ViT_MoCo_Project/artifacts/vit_baseline//checkpoint_epoch_31.pth
+[2025-12-09 14:37:39] Epoch complete 31, Avg. Running Loss: 6.259102
+[2025-12-09 14:37:39] POS_COS=0.9832
+[2025-12-09 14:37:39] Loss improved from 6.278921 to 6.259102. Saving checkpoint.
+[2025-12-09 14:37:40] Saving checkpoint at epoch 32; /content/drive/MyDrive/ViT_MoCo_Project/artifacts/vit_baseline//checkpoint_epoch_32.pth
+[2025-12-09 14:41:17] Epoch complete 32, Avg. Running Loss: 6.263755
+[2025-12-09 14:41:17] POS_COS=0.9822
+[2025-12-09 14:44:59] Epoch complete 33, Avg. Running Loss: 6.247584
+[2025-12-09 14:44:59] POS_COS=0.9852
+[2025-12-09 14:44:59] Loss improved from 6.259102 to 6.247584. Saving checkpoint.
+[2025-12-09 14:45:00] Saving checkpoint at epoch 34; /content/drive/MyDrive/ViT_MoCo_Project/artifacts/vit_baseline//checkpoint_epoch_34.pth
+[2025-12-09 14:48:47] Epoch complete 34, Avg. Running Loss: 6.243878
+[2025-12-09 14:48:47] POS_COS=0.9858
+[2025-12-09 14:48:47] Loss improved from 6.247584 to 6.243878. Saving checkpoint.
+[2025-12-09 14:48:48] Saving checkpoint at epoch 35; /content/drive/MyDrive/ViT_MoCo_Project/artifacts/vit_baseline//checkpoint_epoch_35.pth
+[2025-12-09 14:52:31] Epoch complete 35, Avg. Running Loss: 6.252475
+[2025-12-09 14:52:31] POS_COS=0.9841
+[2025-12-09 14:56:14] Epoch complete 36, Avg. Running Loss: 6.261577
+[2025-12-09 14:56:14] POS_COS=0.9823
+[2025-12-09 14:59:50] Epoch complete 37, Avg. Running Loss: 6.261921
+[2025-12-09 14:59:50] POS_COS=0.9822
+[2025-12-09 15:03:28] Epoch complete 38, Avg. Running Loss: 6.261120
+[2025-12-09 15:03:28] POS_COS=0.9824
+[2025-12-09 15:07:07] Epoch complete 39, Avg. Running Loss: 6.281057
+[2025-12-09 15:07:07] POS_COS=0.9785
+[2025-12-09 15:07:07] Loss improved from 6.243878 to 6.281057. Saving checkpoint.
+[2025-12-09 15:07:08] Saving checkpoint at epoch 40; /content/drive/MyDrive/ViT_MoCo_Project/artifacts/vit_baseline//checkpoint_epoch_40.pth
+[2025-12-09 15:10:49] Epoch complete 40, Avg. Running Loss: 6.279374
+[2025-12-09 15:10:49] POS_COS=0.9788
+[2025-12-09 15:10:49] Loss improved from 6.281057 to 6.279374. Saving checkpoint.
+[2025-12-09 15:10:50] Saving checkpoint at epoch 41; /content/drive/MyDrive/ViT_MoCo_Project/artifacts/vit_baseline//checkpoint_epoch_41.pth
+[2025-12-09 15:14:27] Epoch complete 41, Avg. Running Loss: 6.254235
+[2025-12-09 15:14:27] POS_COS=0.9838
+[2025-12-09 15:14:27] Loss improved from 6.279374 to 6.254235. Saving checkpoint.
+[2025-12-09 15:14:28] Saving checkpoint at epoch 42; /content/drive/MyDrive/ViT_MoCo_Project/artifacts/vit_baseline//checkpoint_epoch_42.pth
+[2025-12-09 15:18:06] Epoch complete 42, Avg. Running Loss: 6.240580
+[2025-12-09 15:18:06] POS_COS=0.9865
+[2025-12-09 15:18:06] Loss improved from 6.254235 to 6.240580. Saving checkpoint.
+[2025-12-09 15:18:07] Saving checkpoint at epoch 43; /content/drive/MyDrive/ViT_MoCo_Project/artifacts/vit_baseline//checkpoint_epoch_43.pth
+[2025-12-09 15:21:49] Epoch complete 43, Avg. Running Loss: 6.234105
+[2025-12-09 15:21:49] POS_COS=0.9878
+[2025-12-09 15:21:49] Loss improved from 6.240580 to 6.234105. Saving checkpoint.
+[2025-12-09 15:21:50] Saving checkpoint at epoch 44; /content/drive/MyDrive/ViT_MoCo_Project/artifacts/vit_baseline//checkpoint_epoch_44.pth
+[2025-12-09 15:25:31] Epoch complete 44, Avg. Running Loss: 6.232145
+[2025-12-09 15:25:31] POS_COS=0.9882
+[2025-12-09 15:25:31] Loss improved from 6.234105 to 6.232145. Saving checkpoint.
+[2025-12-09 15:25:31] Saving checkpoint at epoch 45; /content/drive/MyDrive/ViT_MoCo_Project/artifacts/vit_baseline//checkpoint_epoch_45.pth
+[2025-12-09 15:29:15] Epoch complete 45, Avg. Running Loss: 6.235783
+[2025-12-09 15:29:15] POS_COS=0.9874
+[2025-12-09 15:32:57] Epoch complete 46, Avg. Running Loss: 6.246140
+[2025-12-09 15:32:57] POS_COS=0.9853
+[2025-12-09 15:36:38] Epoch complete 47, Avg. Running Loss: 6.231273
+[2025-12-09 15:36:38] POS_COS=0.9883
+[2025-12-09 15:36:38] Loss improved from 6.232145 to 6.231273. Saving checkpoint.
+[2025-12-09 15:36:39] Saving checkpoint at epoch 48; /content/drive/MyDrive/ViT_MoCo_Project/artifacts/vit_baseline//checkpoint_epoch_48.pth
+[2025-12-09 15:40:23] Epoch complete 48, Avg. Running Loss: 6.238782
+[2025-12-09 15:40:23] POS_COS=0.9868
+[2025-12-09 15:44:05] Epoch complete 49, Avg. Running Loss: 6.233980
+[2025-12-09 15:44:05] POS_COS=0.9878
+[2025-12-09 15:44:05] Loss improved from 6.231273 to 6.233980. Saving checkpoint.
+[2025-12-09 15:44:06] Saving checkpoint at epoch 50; /content/drive/MyDrive/ViT_MoCo_Project/artifacts/vit_baseline//checkpoint_epoch_50.pth
+[2025-12-09 15:47:51] Epoch complete 50, Avg. Running Loss: 6.238999
+[2025-12-09 15:47:51] POS_COS=0.9868
+[2025-12-09 15:51:27] Epoch complete 51, Avg. Running Loss: 6.241187
+[2025-12-09 15:51:27] POS_COS=0.9863
+[2025-12-09 15:55:08] Epoch complete 52, Avg. Running Loss: 6.241578
+[2025-12-09 15:55:08] POS_COS=0.9863
+[2025-12-09 15:58:48] Epoch complete 53, Avg. Running Loss: 6.234450
+[2025-12-09 15:58:48] POS_COS=0.9876
+[2025-12-09 16:02:26] Epoch complete 54, Avg. Running Loss: 6.227082
+[2025-12-09 16:02:26] POS_COS=0.9891
+[2025-12-09 16:02:26] Loss improved from 6.233980 to 6.227082. Saving checkpoint.
+[2025-12-09 16:02:27] Saving checkpoint at epoch 55; /content/drive/MyDrive/ViT_MoCo_Project/artifacts/vit_baseline//checkpoint_epoch_55.pth
+[2025-12-09 16:06:08] Epoch complete 55, Avg. Running Loss: 6.222187
+[2025-12-09 16:06:08] POS_COS=0.9901
+[2025-12-09 16:06:08] Loss improved from 6.227082 to 6.222187. Saving checkpoint.
+[2025-12-09 16:06:09] Saving checkpoint at epoch 56; /content/drive/MyDrive/ViT_MoCo_Project/artifacts/vit_baseline//checkpoint_epoch_56.pth
+[2025-12-09 16:10:02] Epoch complete 56, Avg. Running Loss: 6.221954
+[2025-12-09 16:10:02] POS_COS=0.9901
+[2025-12-09 16:10:02] Loss improved from 6.222187 to 6.221954. Saving checkpoint.
+[2025-12-09 16:10:03] Saving checkpoint at epoch 57; /content/drive/MyDrive/ViT_MoCo_Project/artifacts/vit_baseline//checkpoint_epoch_57.pth
+[2025-12-09 16:13:51] Epoch complete 57, Avg. Running Loss: 6.218101
+[2025-12-09 16:13:51] POS_COS=0.9909
+[2025-12-09 16:13:51] Loss improved from 6.221954 to 6.218101. Saving checkpoint.
+[2025-12-09 16:13:52] Saving checkpoint at epoch 58; /content/drive/MyDrive/ViT_MoCo_Project/artifacts/vit_baseline//checkpoint_epoch_58.pth
+[2025-12-09 16:17:34] Epoch complete 58, Avg. Running Loss: 6.212848
+[2025-12-09 16:17:34] POS_COS=0.9919
+[2025-12-09 16:17:34] Loss improved from 6.218101 to 6.212848. Saving checkpoint.
+[2025-12-09 16:17:34] Saving checkpoint at epoch 59; /content/drive/MyDrive/ViT_MoCo_Project/artifacts/vit_baseline//checkpoint_epoch_59.pth
+[2025-12-09 16:21:18] Epoch complete 59, Avg. Running Loss: 6.211277
+[2025-12-09 16:21:18] POS_COS=0.9922
+[2025-12-09 16:21:18] Loss improved from 6.212848 to 6.211277. Saving checkpoint.
+[2025-12-09 16:21:19] Saving checkpoint at epoch 60; /content/drive/MyDrive/ViT_MoCo_Project/artifacts/vit_baseline//checkpoint_epoch_60.pth
+[2025-12-09 16:24:56] Epoch complete 60, Avg. Running Loss: 6.209759
+[2025-12-09 16:24:56] POS_COS=0.9925
+[2025-12-09 16:24:56] Loss improved from 6.211277 to 6.209759. Saving checkpoint.
+[2025-12-09 16:24:57] Saving checkpoint at epoch 61; /content/drive/MyDrive/ViT_MoCo_Project/artifacts/vit_baseline//checkpoint_epoch_61.pth
+[2025-12-09 16:28:40] Epoch complete 61, Avg. Running Loss: 6.212297
+[2025-12-09 16:28:40] POS_COS=0.9919
+[2025-12-09 16:32:15] Epoch complete 62, Avg. Running Loss: 6.216020
+[2025-12-09 16:32:15] POS_COS=0.9912
+[2025-12-09 16:35:54] Epoch complete 63, Avg. Running Loss: 6.211960
+[2025-12-09 16:35:54] POS_COS=0.9920
+[2025-12-09 16:39:32] Epoch complete 64, Avg. Running Loss: 6.209292
+[2025-12-09 16:39:32] POS_COS=0.9925
+[2025-12-09 16:39:32] Loss improved from 6.209759 to 6.209292. Saving checkpoint.
+[2025-12-09 16:39:33] Saving checkpoint at epoch 65; /content/drive/MyDrive/ViT_MoCo_Project/artifacts/vit_baseline//checkpoint_epoch_65.pth
+[2025-12-09 16:43:13] Epoch complete 65, Avg. Running Loss: 6.203174
+[2025-12-09 16:43:13] POS_COS=0.9937
+[2025-12-09 16:43:13] Loss improved from 6.209292 to 6.203174. Saving checkpoint.
+[2025-12-09 16:43:14] Saving checkpoint at epoch 66; /content/drive/MyDrive/ViT_MoCo_Project/artifacts/vit_baseline//checkpoint_epoch_66.pth
+[2025-12-09 16:46:59] Epoch complete 66, Avg. Running Loss: 6.201995
+[2025-12-09 16:46:59] POS_COS=0.9939
+[2025-12-09 16:46:59] Loss improved from 6.203174 to 6.201995. Saving checkpoint.
+[2025-12-09 16:46:59] Saving checkpoint at epoch 67; /content/drive/MyDrive/ViT_MoCo_Project/artifacts/vit_baseline//checkpoint_epoch_67.pth
+[2025-12-09 16:50:36] Epoch complete 67, Avg. Running Loss: 6.196734
+[2025-12-09 16:50:36] POS_COS=0.9949
+[2025-12-09 16:50:36] Loss improved from 6.201995 to 6.196734. Saving checkpoint.
+[2025-12-09 16:50:37] Saving checkpoint at epoch 68; /content/drive/MyDrive/ViT_MoCo_Project/artifacts/vit_baseline//checkpoint_epoch_68.pth
+[2025-12-09 16:54:18] Epoch complete 68, Avg. Running Loss: 6.195275
+[2025-12-09 16:54:18] POS_COS=0.9952
+[2025-12-09 16:54:18] Loss improved from 6.196734 to 6.195275. Saving checkpoint.
+[2025-12-09 16:54:18] Saving checkpoint at epoch 69; /content/drive/MyDrive/ViT_MoCo_Project/artifacts/vit_baseline//checkpoint_epoch_69.pth
+[2025-12-09 16:58:09] Epoch complete 69, Avg. Running Loss: 6.196071
+[2025-12-09 16:58:09] POS_COS=0.9950
+[2025-12-09 16:58:09] Loss improved from 6.195275 to 6.196071. Saving checkpoint.
+[2025-12-09 16:58:10] Saving checkpoint at epoch 70; /content/drive/MyDrive/ViT_MoCo_Project/artifacts/vit_baseline//checkpoint_epoch_70.pth
+[2025-12-09 17:01:52] Epoch complete 70, Avg. Running Loss: 6.194002
+[2025-12-09 17:01:52] POS_COS=0.9954
+[2025-12-09 17:01:52] Loss improved from 6.196071 to 6.194002. Saving checkpoint.
+[2025-12-09 17:01:53] Saving checkpoint at epoch 71; /content/drive/MyDrive/ViT_MoCo_Project/artifacts/vit_baseline//checkpoint_epoch_71.pth
+[2025-12-09 17:05:38] Epoch complete 71, Avg. Running Loss: 6.189840
+[2025-12-09 17:05:38] POS_COS=0.9962
+[2025-12-09 17:05:38] Loss improved from 6.194002 to 6.189840. Saving checkpoint.
+[2025-12-09 17:05:39] Saving checkpoint at epoch 72; /content/drive/MyDrive/ViT_MoCo_Project/artifacts/vit_baseline//checkpoint_epoch_72.pth
+[2025-12-09 17:09:23] Epoch complete 72, Avg. Running Loss: 6.194142
+[2025-12-09 17:09:23] POS_COS=0.9953
+[2025-12-09 17:13:06] Epoch complete 73, Avg. Running Loss: 6.192716
+[2025-12-09 17:13:06] POS_COS=0.9956
+[2025-12-09 17:16:48] Epoch complete 74, Avg. Running Loss: 6.189138
+[2025-12-09 17:16:48] POS_COS=0.9963
+[2025-12-09 17:16:48] Loss improved from 6.189840 to 6.189138. Saving checkpoint.
+[2025-12-09 17:16:48] Saving checkpoint at epoch 75; /content/drive/MyDrive/ViT_MoCo_Project/artifacts/vit_baseline//checkpoint_epoch_75.pth
+[2025-12-09 17:20:26] Epoch complete 75, Avg. Running Loss: 6.187446
+[2025-12-09 17:20:26] POS_COS=0.9966
+[2025-12-09 17:20:26] Loss improved from 6.189138 to 6.187446. Saving checkpoint.
+[2025-12-09 17:20:27] Saving checkpoint at epoch 76; /content/drive/MyDrive/ViT_MoCo_Project/artifacts/vit_baseline//checkpoint_epoch_76.pth
+[2025-12-09 17:24:14] Epoch complete 76, Avg. Running Loss: 6.188573
+[2025-12-09 17:24:14] POS_COS=0.9963
+[2025-12-09 17:27:44] Epoch complete 77, Avg. Running Loss: 6.186782
+[2025-12-09 17:27:44] POS_COS=0.9967
+[2025-12-09 17:27:44] Loss improved from 6.187446 to 6.186782. Saving checkpoint.
+[2025-12-09 17:27:45] Saving checkpoint at epoch 78; /content/drive/MyDrive/ViT_MoCo_Project/artifacts/vit_baseline//checkpoint_epoch_78.pth
+[2025-12-09 17:31:26] Epoch complete 78, Avg. Running Loss: 6.184966
+[2025-12-09 17:31:26] POS_COS=0.9971
+[2025-12-09 17:31:26] Loss improved from 6.186782 to 6.184966. Saving checkpoint.
+[2025-12-09 17:31:27] Saving checkpoint at epoch 79; /content/drive/MyDrive/ViT_MoCo_Project/artifacts/vit_baseline//checkpoint_epoch_79.pth
+[2025-12-09 17:35:06] Epoch complete 79, Avg. Running Loss: 6.185463
+[2025-12-09 17:35:06] POS_COS=0.9970
+[2025-12-09 17:35:06] Loss improved from 6.184966 to 6.185463. Saving checkpoint.
+[2025-12-09 17:35:07] Saving checkpoint at epoch 80; /content/drive/MyDrive/ViT_MoCo_Project/artifacts/vit_baseline//checkpoint_epoch_80.pth
+[2025-12-09 17:38:49] Epoch complete 80, Avg. Running Loss: 6.182138
+[2025-12-09 17:38:49] POS_COS=0.9976
+[2025-12-09 17:38:49] Loss improved from 6.185463 to 6.182138. Saving checkpoint.
+[2025-12-09 17:38:50] Saving checkpoint at epoch 81; /content/drive/MyDrive/ViT_MoCo_Project/artifacts/vit_baseline//checkpoint_epoch_81.pth
+[2025-12-09 17:42:33] Epoch complete 81, Avg. Running Loss: 6.181006
+[2025-12-09 17:42:33] POS_COS=0.9978
+[2025-12-09 17:42:33] Loss improved from 6.182138 to 6.181006. Saving checkpoint.
+[2025-12-09 17:42:34] Saving checkpoint at epoch 82; /content/drive/MyDrive/ViT_MoCo_Project/artifacts/vit_baseline//checkpoint_epoch_82.pth
+[2025-12-09 17:46:18] Epoch complete 82, Avg. Running Loss: 6.181304
+[2025-12-09 17:46:18] POS_COS=0.9977
+[2025-12-09 17:50:02] Epoch complete 83, Avg. Running Loss: 6.180268
+[2025-12-09 17:50:02] POS_COS=0.9979
+[2025-12-09 17:50:02] Loss improved from 6.181006 to 6.180268. Saving checkpoint.
+[2025-12-09 17:50:03] Saving checkpoint at epoch 84; /content/drive/MyDrive/ViT_MoCo_Project/artifacts/vit_baseline//checkpoint_epoch_84.pth
+[2025-12-09 17:53:50] Epoch complete 84, Avg. Running Loss: 6.178552
+[2025-12-09 17:53:50] POS_COS=0.9982
+[2025-12-09 17:53:50] Loss improved from 6.180268 to 6.178552. Saving checkpoint.
+[2025-12-09 17:53:51] Saving checkpoint at epoch 85; /content/drive/MyDrive/ViT_MoCo_Project/artifacts/vit_baseline//checkpoint_epoch_85.pth
+[2025-12-09 17:57:39] Epoch complete 85, Avg. Running Loss: 6.178409
+[2025-12-09 17:57:39] POS_COS=0.9983
+[2025-12-09 17:57:39] Loss improved from 6.178552 to 6.178409. Saving checkpoint.
+[2025-12-09 17:57:40] Saving checkpoint at epoch 86; /content/drive/MyDrive/ViT_MoCo_Project/artifacts/vit_baseline//checkpoint_epoch_86.pth
+[2025-12-09 18:01:19] Epoch complete 86, Avg. Running Loss: 6.177919
+[2025-12-09 18:01:19] POS_COS=0.9983
+[2025-12-09 18:01:19] Loss improved from 6.178409 to 6.177919. Saving checkpoint.
+[2025-12-09 18:01:20] Saving checkpoint at epoch 87; /content/drive/MyDrive/ViT_MoCo_Project/artifacts/vit_baseline//checkpoint_epoch_87.pth
+[2025-12-09 18:05:03] Epoch complete 87, Avg. Running Loss: 6.176772
+[2025-12-09 18:05:03] POS_COS=0.9985
+[2025-12-09 18:05:03] Loss improved from 6.177919 to 6.176772. Saving checkpoint.
+[2025-12-09 18:05:04] Saving checkpoint at epoch 88; /content/drive/MyDrive/ViT_MoCo_Project/artifacts/vit_baseline//checkpoint_epoch_88.pth
+[2025-12-09 18:08:49] Epoch complete 88, Avg. Running Loss: 6.176110
+[2025-12-09 18:08:49] POS_COS=0.9986
+[2025-12-09 18:08:49] Loss improved from 6.176772 to 6.176110. Saving checkpoint.
+[2025-12-09 18:08:50] Saving checkpoint at epoch 89; /content/drive/MyDrive/ViT_MoCo_Project/artifacts/vit_baseline//checkpoint_epoch_89.pth
+[2025-12-09 18:12:27] Epoch complete 89, Avg. Running Loss: 6.175249
+[2025-12-09 18:12:27] POS_COS=0.9988
+[2025-12-09 18:12:27] Loss improved from 6.176110 to 6.175249. Saving checkpoint.
+[2025-12-09 18:12:28] Saving checkpoint at epoch 90; /content/drive/MyDrive/ViT_MoCo_Project/artifacts/vit_baseline//checkpoint_epoch_90.pth
+[2025-12-09 18:16:05] Epoch complete 90, Avg. Running Loss: 6.175026
+[2025-12-09 18:16:05] POS_COS=0.9988
+[2025-12-09 18:16:05] Loss improved from 6.175249 to 6.175026. Saving checkpoint.
+[2025-12-09 18:16:06] Saving checkpoint at epoch 91; /content/drive/MyDrive/ViT_MoCo_Project/artifacts/vit_baseline//checkpoint_epoch_91.pth
+[2025-12-09 18:19:38] Epoch complete 91, Avg. Running Loss: 6.174571
+[2025-12-09 18:19:38] POS_COS=0.9989
+[2025-12-09 18:19:38] Loss improved from 6.175026 to 6.174571. Saving checkpoint.
+[2025-12-09 18:19:38] Saving checkpoint at epoch 92; /content/drive/MyDrive/ViT_MoCo_Project/artifacts/vit_baseline//checkpoint_epoch_92.pth
+[2025-12-09 18:23:14] Epoch complete 92, Avg. Running Loss: 6.174101
+[2025-12-09 18:23:14] POS_COS=0.9990
+[2025-12-09 18:23:14] Loss improved from 6.174571 to 6.174101. Saving checkpoint.
+[2025-12-09 18:23:15] Saving checkpoint at epoch 93; /content/drive/MyDrive/ViT_MoCo_Project/artifacts/vit_baseline//checkpoint_epoch_93.pth
+[2025-12-09 18:26:59] Epoch complete 93, Avg. Running Loss: 6.173806
+[2025-12-09 18:26:59] POS_COS=0.9991
+[2025-12-09 18:26:59] Loss improved from 6.174101 to 6.173806. Saving checkpoint.
+[2025-12-09 18:27:00] Saving checkpoint at epoch 94; /content/drive/MyDrive/ViT_MoCo_Project/artifacts/vit_baseline//checkpoint_epoch_94.pth
+[2025-12-09 18:30:41] Epoch complete 94, Avg. Running Loss: 6.173225
+[2025-12-09 18:30:41] POS_COS=0.9992
+[2025-12-09 18:30:41] Loss improved from 6.173806 to 6.173225. Saving checkpoint.
+[2025-12-09 18:30:41] Saving checkpoint at epoch 95; /content/drive/MyDrive/ViT_MoCo_Project/artifacts/vit_baseline//checkpoint_epoch_95.pth
+[2025-12-09 18:34:20] Epoch complete 95, Avg. Running Loss: 6.172803
+[2025-12-09 18:34:20] POS_COS=0.9992
+[2025-12-09 18:34:20] Loss improved from 6.173225 to 6.172803. Saving checkpoint.
+[2025-12-09 18:34:21] Saving checkpoint at epoch 96; /content/drive/MyDrive/ViT_MoCo_Project/artifacts/vit_baseline//checkpoint_epoch_96.pth
+[2025-12-09 18:37:55] Epoch complete 96, Avg. Running Loss: 6.171930
+[2025-12-09 18:37:55] POS_COS=0.9993
+[2025-12-09 18:37:55] Loss improved from 6.172803 to 6.171930. Saving checkpoint.
+[2025-12-09 18:37:56] Saving checkpoint at epoch 97; /content/drive/MyDrive/ViT_MoCo_Project/artifacts/vit_baseline//checkpoint_epoch_97.pth
+[2025-12-09 18:41:39] Epoch complete 97, Avg. Running Loss: 6.171570
+[2025-12-09 18:41:39] POS_COS=0.9994
+[2025-12-09 18:41:39] Loss improved from 6.171930 to 6.171570. Saving checkpoint.
+[2025-12-09 18:41:40] Saving checkpoint at epoch 98; /content/drive/MyDrive/ViT_MoCo_Project/artifacts/vit_baseline//checkpoint_epoch_98.pth
+[2025-12-09 18:45:16] Epoch complete 98, Avg. Running Loss: 6.171195
+[2025-12-09 18:45:16] POS_COS=0.9995
+[2025-12-09 18:45:16] Loss improved from 6.171570 to 6.171195. Saving checkpoint.
+[2025-12-09 18:45:17] Saving checkpoint at epoch 99; /content/drive/MyDrive/ViT_MoCo_Project/artifacts/vit_baseline//checkpoint_epoch_99.pth
+[2025-12-09 18:48:57] Epoch complete 99, Avg. Running Loss: 6.171317
+[2025-12-09 18:48:57] POS_COS=0.9994
+[2025-12-09 18:48:57] Loss improved from 6.171195 to 6.171317. Saving checkpoint.
+[2025-12-09 18:48:57] Saving checkpoint at epoch 100; /content/drive/MyDrive/ViT_MoCo_Project/artifacts/vit_baseline//checkpoint_epoch_100.pth
+[2025-12-09 18:48:57] MoCo training complete!!
+[2025-12-09 18:48:58] Saved pretrained encoder to /content/drive/MyDrive/ViT_MoCo_Project/artifacts/vit_baseline/vit_s16_moco_encoder_v1.pth
+[2025-12-09 18:48:58] Saved training stats to /content/drive/MyDrive/ViT_MoCo_Project/artifacts/vit_baseline//pretrain_stats_training.json
